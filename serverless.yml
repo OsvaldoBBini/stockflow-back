@@ -8,6 +8,8 @@ provider:
 
 package:
   individually: true
+  patterns:
+    - '!**.spec.ts'
 
 build:
   esbuild:
