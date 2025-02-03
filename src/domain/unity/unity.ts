@@ -1,0 +1,1 @@
+export type IUnity = 'kg' | 'g' | 'ml' | 'l'
