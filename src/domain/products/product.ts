@@ -1,13 +1,16 @@
+import { UUID } from 'node:crypto';
 import { IUnity } from '../unity/unity';
 
 interface IProductProps {
-  name: string;
+  id: UUID;
+  category: string;
   company: string;
-  cost: number;
+  user: string;
+  name: string;
+  pricePaid: number;
+  unityMeasure: IUnity;
   quatity: number;
   date: string;
-  unity: IUnity;
-  category: string;
 }
 
 export class Product {
@@ -17,16 +20,32 @@ export class Product {
     this.props = props;
   }
 
-  get name() {
-    return this.props.name;
+  get id() {
+    return this.props.id;
+  }
+
+  get category() {
+    return this.props.category;
   }
 
   get company() {
     return this.props.company;
   }
 
-  get cost() {
-    return this.props.cost;
+  get user() {
+    return this.props.user;
+  }
+
+  get name() {
+    return this.props.name;
+  }
+
+  get pricePaid() {
+    return this.props.pricePaid;
+  }
+
+  get unityMeasure() {
+    return this.props.unityMeasure;
   }
 
   get quantity() {
@@ -35,14 +54,6 @@ export class Product {
 
   get date() {
     return this.props.date;
-  }
-
-  get unity() {
-    return this.props.unity;
-  }
-
-  get category() {
-    return this.props.category;
   }
 
 } 
