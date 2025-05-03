@@ -3,14 +3,15 @@ import { IUnity } from '../unity/unity';
 
 interface IProductProps {
   id: UUID;
-  category: string;
+  categoryId: UUID;
   company: string;
   user: string;
   name: string;
   pricePaid: number;
   unityMeasure: IUnity;
   quatity: number;
-  date: string;
+  entryDate: Date;
+  expirationDate: Date;
 }
 
 export class Product {
@@ -18,14 +19,20 @@ export class Product {
 
   constructor(props: IProductProps){
     this.props = props;
+
+    if (props.expirationDate < props.entryDate) {
+      throw new Error('Unable to record the product because the expiration date is no longer valid.');
+    }
+
+    this.props = props;
   }
 
   get id() {
     return this.props.id;
   }
 
-  get category() {
-    return this.props.category;
+  get categoryId() {
+    return this.props.categoryId;
   }
 
   get company() {
@@ -52,8 +59,12 @@ export class Product {
     return this.props.quatity;
   }
 
-  get date() {
-    return this.props.date;
+  get entryDate() {
+    return this.props.entryDate;
+  }
+
+  get expirationDate() {
+    return this.props.expirationDate;
   }
 
 } 
