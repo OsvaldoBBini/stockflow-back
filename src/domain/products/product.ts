@@ -4,7 +4,7 @@ import { IUnity } from '../unity/unity';
 interface IProductProps {
   id: UUID;
   categoryId: UUID;
-  company: string;
+  companyId: UUID;
   user: string;
   name: string;
   pricePaid: number;
@@ -35,8 +35,8 @@ export class Product {
     return this.props.categoryId;
   }
 
-  get company() {
-    return this.props.company;
+  get companyId() {
+    return this.props.companyId;
   }
 
   get user() {

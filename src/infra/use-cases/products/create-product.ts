@@ -19,13 +19,13 @@ export class CreateProduct implements CreateProductInterface {
 
   async execute(product: Product) {
     try{
-      const isAValidCategory = await this.categoriesRepository.getCategoryById(product.categoryId);
+      const isAValidCategory = await this.categoriesRepository.getCategoryById(product.categoryId, product.companyId);
       if (!isAValidCategory) {
         throw new Error('Category not valid');
       } 
       await this.productsRepository.insertNewProduct(product);
     } catch(error) {
-      throw new UseCaseError(`Not able to register your product due to: ${String(error)}`);
+      throw new UseCaseError(`Not able to register your product due to: ${error.message}`);
     }
     return null;
   }

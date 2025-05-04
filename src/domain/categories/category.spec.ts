@@ -9,7 +9,7 @@ test('should initialize a category', () => {
     name: 'test-name',
     description: 'test-description',
     user: 'test-user',
-    company: 'test-company'
+    companyId: randomUUID()
   };
   
   const category = new Category(mockCategory);

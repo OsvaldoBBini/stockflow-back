@@ -5,7 +5,7 @@ interface CategoryProps {
   name: string;
   description: null | string;
   user: string;
-  company: string;
+  companyId: UUID;
 }
 
 export class Category {
@@ -31,7 +31,7 @@ export class Category {
     return this.props.user;
   }
 
-  get company() {
-    return this.props.company;
+  get companyId() {
+    return this.props.companyId;
   }
 }
