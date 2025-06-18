@@ -5,7 +5,7 @@ interface IProductProps {
   id: UUID;
   categoryId: UUID;
   companyId: UUID;
-  user: string;
+  userId: UUID;
   name: string;
   pricePaid: number;
   unityMeasure: IUnity;
@@ -39,8 +39,8 @@ export class Product {
     return this.props.companyId;
   }
 
-  get user() {
-    return this.props.user;
+  get userId() {
+    return this.props.userId;
   }
 
   get name() {
