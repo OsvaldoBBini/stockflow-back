@@ -1,8 +1,8 @@
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { z, ZodError } from 'zod';
+import { z } from 'zod';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { errorHandler } from '../../../errors/errorHandler';
+import { ErrorManager } from '../../../errors/errorManager';
 
 const signInSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
@@ -44,7 +44,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     };
 
   } catch (e) {
-    const errorResponse = errorHandler(e, logger);
+    const errorResponse = new ErrorManager(logger).errorHandler(e);
     return errorResponse;
   }
 }
