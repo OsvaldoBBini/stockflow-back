@@ -8,6 +8,7 @@ const signInSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
   password: z.string({message: 'Invalid password'}),
 });
+
 const logger = new Logger({ serviceName: 'signIn' });
 
 export async function handler(event: APIGatewayProxyEventV2) {
