@@ -51,7 +51,7 @@ describe('signIn', () => {
     });
   });
 
-  it('should return a 401 with a error message indicating invalid credentials', async () => {
+  it('should return a 401 with an error message indicating invalid credentials', async () => {
 
     cognitoMock.on(InitiateAuthCommand).resolves({
       AuthenticationResult: undefined,
@@ -65,7 +65,7 @@ describe('signIn', () => {
     });
   });
 
-  it('should return a 400 with a error message indicating invalid input data', async () => {
+  it('should return a 400 with an error message indicating invalid input data', async () => {
     cognitoMock.on(InitiateAuthCommand).resolves({
       AuthenticationResult: undefined,
     });

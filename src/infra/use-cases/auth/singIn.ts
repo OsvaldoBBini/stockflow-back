@@ -16,7 +16,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     const cognitoClient = new CognitoIdentityProviderClient();
     const { email, password } = signInSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: {email, password}}));
+    logger.debug(JSON.stringify({inputs: { email }}));
 
     const command = new InitiateAuthCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,

@@ -50,7 +50,7 @@ describe('signUp', () => {
     });
   });
 
-  it('should return a 400 with a error message indicating invalid input data', async () => {
+  it('should return a 400 with an error message indicating invalid input data', async () => {
     cognitoMock.on(SignUpCommand).resolves({
       UserSub: mockUserSub
     });
@@ -64,7 +64,7 @@ describe('signUp', () => {
     });
   });
 
-  it('should return a 409 with a error message indicating already in used e-mail', async () => {
+  it('should return a 409 with an error message indicating already in used e-mail', async () => {
 
     const mockError = new UsernameExistsException('');
     cognitoMock.on(SignUpCommand).rejects(mockError);

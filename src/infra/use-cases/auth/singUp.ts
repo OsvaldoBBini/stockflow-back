@@ -14,7 +14,7 @@ const signUpSchema = z.object({
       { message: 'Password must contain at least one uppercase letter.' }
     )
     .regex(
-      /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, 
+      /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, 
       { message: 'Password must contain at least one special character.' }
     ),
   firstName: z.string(),
@@ -33,7 +33,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       firstName, 
       lastName } = signUpSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: {email, password, firstName, lastName}}));
+    logger.debug(JSON.stringify({inputs: {email, firstName, lastName}}));
 
     const command = new SignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -59,14 +59,17 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   } catch (e) {
 
+    const errorManager = new ErrorManager(logger);
+
     if (e instanceof UsernameExistsException) {
+      errorManager.dispatchLoggerMessage(e);
       return {
         statusCode: 409,
         body: JSON.stringify({ message: 'E-mail already in used' })
       };
     }
     
-    const errorResponse = new ErrorManager(logger).errorHandler(e);
+    const errorResponse = errorManager.errorHandler(e);
     return errorResponse;
   }
   

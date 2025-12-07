@@ -11,7 +11,7 @@ export class ErrorManager {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private dispatchLoggerMessage(e: any) {
+  public dispatchLoggerMessage(e: any) {
     this.logger.error(JSON.stringify({error: e.stack}));
   }
 
