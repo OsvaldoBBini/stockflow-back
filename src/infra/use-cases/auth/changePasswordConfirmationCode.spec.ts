@@ -1,8 +1,8 @@
-import { CodeMismatchException, CognitoIdentityProviderClient, ConfirmSignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { CodeMismatchException, CognitoIdentityProviderClient, ConfirmSignUpCommand, ForgotPasswordCommand, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { handler } from './accountConfirmation';
+import { handler } from './changePasswordConfirmationCode';
 
 describe('accountConfirmation', () => {
 
@@ -11,7 +11,6 @@ describe('accountConfirmation', () => {
   const event = {
     body: JSON.stringify({
       email: 'test@example.com',
-      confirmationCode: '123456',
     }),
   } as APIGatewayProxyEventV2;
   
@@ -28,24 +27,24 @@ describe('accountConfirmation', () => {
     vi.clearAllMocks();
   });
   
-  it('should validate the confirmation code', async () => {
+  it('should generate the valid code', async () => {
     
-    cognitoMock.on(ConfirmSignUpCommand).resolves({});
+    cognitoMock.on(ForgotPasswordCommand).resolves({});
     const response = await handler(event);
 
     expect(response.statusCode).toBe(200);
 
   });
 
-  it('should return a 409 with an error message indicating a invalid confirmation code', async () => {
+  it('should return a 404 with an error message indicating a not exist user', async () => {
 
-    const mockError = new CodeMismatchException('');
-    cognitoMock.on(ConfirmSignUpCommand).rejects(mockError);
+    const mockError = new UserNotFoundException('');
+    cognitoMock.on(ForgotPasswordCommand).rejects(mockError);
 
     const response = await handler(event);
     expect(response.statusCode).toBe(404);    
     expect(JSON.parse(response.body)).toEqual({
-      message: 'The confirmation code is not valid'
+      message: 'User not found'
     });
   });
 
