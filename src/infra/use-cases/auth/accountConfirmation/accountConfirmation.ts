@@ -2,7 +2,7 @@ import { Logger } from '@aws-lambda-powertools/logger';
 import { CodeMismatchException, CognitoIdentityProviderClient, ConfirmSignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import z from 'zod';
-import { ErrorManager } from '../../../errors/errorManager';
+import { ErrorManager } from '../../../../errors/errorManager';
 
 const accountConfirmationSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),

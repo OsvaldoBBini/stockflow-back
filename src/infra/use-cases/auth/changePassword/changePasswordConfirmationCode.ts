@@ -3,7 +3,7 @@ import { Logger } from '@aws-lambda-powertools/logger';
 import { CognitoIdentityProviderClient, ForgotPasswordCommand, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import z from 'zod';
-import { ErrorManager } from '../../../errors/errorManager';
+import { ErrorManager } from '../../../../errors/errorManager';
 
 const changePasswordConfirmationCodeSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),

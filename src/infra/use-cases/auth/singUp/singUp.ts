@@ -2,7 +2,7 @@ import { CognitoIdentityProviderClient, SignUpCommand, UsernameExistsException }
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { z } from 'zod';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { ErrorManager } from '../../../errors/errorManager';
+import { ErrorManager } from '../../../../errors/errorManager';
 
 const signUpSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
