@@ -1,6 +1,6 @@
 
 import { Logger } from '@aws-lambda-powertools/logger';
-import { CognitoIdentityProviderClient, ForgotPasswordCommand, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ForgotPasswordCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import z from 'zod';
 import { ErrorManager } from '../../../../errors/errorManager';
@@ -10,7 +10,7 @@ const changePasswordConfirmationCodeSchema = z.object({
 });
 
 const logger = new Logger({ serviceName: 'changePasswordConfirmationCode' });
-const { errorHandler, dispatchLoggerMessage } = new ErrorManager(logger);
+const { errorHandler } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
 
@@ -35,18 +35,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     };
 
   } catch (e) {
-
-    if (e instanceof UserNotFoundException) {
-      dispatchLoggerMessage(e);
-      return {
-        statusCode: 404,
-        body: JSON.stringify({message: 'User not found'})
-      };
-    }
-
     const errorResponse = errorHandler(e);
     return errorResponse;
-  
   }
-
 }

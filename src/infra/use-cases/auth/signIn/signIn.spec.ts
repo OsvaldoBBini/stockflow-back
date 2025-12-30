@@ -75,7 +75,21 @@ describe('signIn', () => {
 
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Invalid input data'
+      message:  {
+        'errors':  [],
+        'properties':  {
+          'email':  {
+            'errors':  [
+              'Invalid email format.',
+            ],
+          },
+          'password':  {
+            'errors':  [
+              'Invalid password',
+            ],
+          },
+        },
+      },
     });
   });
 

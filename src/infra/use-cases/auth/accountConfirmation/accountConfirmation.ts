@@ -1,5 +1,5 @@
 import { Logger } from '@aws-lambda-powertools/logger';
-import { CodeMismatchException, CognitoIdentityProviderClient, ConfirmSignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ConfirmSignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import z from 'zod';
 import { ErrorManager } from '../../../../errors/errorManager';
@@ -10,7 +10,7 @@ const accountConfirmationSchema = z.object({
 });
 
 const logger = new Logger({ serviceName: 'accountConfirmation' });
-const { errorHandler, dispatchLoggerMessage } = new ErrorManager(logger);
+const { errorHandler } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
 
@@ -38,15 +38,6 @@ export async function handler(event: APIGatewayProxyEventV2) {
     };
 
   } catch (e) {
-
-    if (e instanceof CodeMismatchException) {
-      dispatchLoggerMessage(e);
-      return {
-        statusCode: 404,
-        body: JSON.stringify({'message': 'The confirmation code is not valid'})
-      };
-    }
-
     const errorResponse = errorHandler(e);
     return errorResponse;
   }

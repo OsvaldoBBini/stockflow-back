@@ -60,7 +60,58 @@ describe('signUp', () => {
   
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Invalid input data'
+      message: {
+        'errors': [],
+        'properties': {
+          'email': {
+            'errors':  [
+              'Invalid email format.',
+            ],
+          },
+          'firstName': {
+            'errors':  [
+              'Invalid input: expected string, received undefined',
+            ],
+          },
+          'lastName': {
+            'errors':  [
+              'Invalid input: expected string, received undefined',
+            ],
+          },
+          'password': {
+            'errors':  [
+              'Invalid input: expected string, received undefined',
+            ],
+          },
+        },
+      },
+    });
+  });
+
+  it('should return a 400 with an error message indicating invalid password', async () => {
+    cognitoMock.on(SignUpCommand).resolves({
+      UserSub: mockUserSub
+    });
+
+    const body = JSON.parse(event.body || '');
+    const emptyBodyEvent = { body:  JSON.stringify({...body, password: ''}) } as APIGatewayProxyEventV2;
+    const response = await handler(emptyBodyEvent);
+  
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body)).toEqual({
+      message: {
+        'errors': [],
+        'properties': {
+          'password': {
+            'errors': [
+              'Password must be at least 8 characters long.',
+              'Password must contain at least one uppercase letter.',
+              'Password must contain at least one number.',
+              'Password must contain at least one special character.',
+            ]
+          }
+        }
+      },
     });
   });
 
