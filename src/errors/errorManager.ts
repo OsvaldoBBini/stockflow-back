@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from '@aws-lambda-powertools/logger';
 import { ZodError } from 'zod';
-
 
 export class ErrorManager {
 
@@ -10,13 +10,11 @@ export class ErrorManager {
     this.logger = logger;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public dispatchLoggerMessage(e: any) {
+  public dispatchLoggerMessage = (e: any) => {
     this.logger.error(JSON.stringify({error: e.stack}));
-  }
+  };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public errorHandler(e: any) {
+  public errorHandler = (e: any) => {
 
     if(e instanceof ZodError) {
       this.dispatchLoggerMessage(e);
@@ -31,6 +29,6 @@ export class ErrorManager {
       statusCode: 500,
       body: JSON.stringify({message: 'Something went wrong'})
     };
-  }
+  };
 
 }

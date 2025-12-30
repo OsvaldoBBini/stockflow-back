@@ -10,6 +10,7 @@ const signInSchema = z.object({
 });
 
 const logger = new Logger({ serviceName: 'signIn' });
+const { errorHandler } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
   try {
@@ -45,7 +46,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     };
 
   } catch (e) {
-    const errorResponse = new ErrorManager(logger).errorHandler(e);
+    const errorResponse = errorHandler(e);
     return errorResponse;
   }
 }

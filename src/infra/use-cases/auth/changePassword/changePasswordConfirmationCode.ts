@@ -10,6 +10,7 @@ const changePasswordConfirmationCodeSchema = z.object({
 });
 
 const logger = new Logger({ serviceName: 'changePasswordConfirmationCode' });
+const { errorHandler, dispatchLoggerMessage } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
 
@@ -35,17 +36,15 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   } catch (e) {
 
-    const errorManager = new ErrorManager(logger);
-
     if (e instanceof UserNotFoundException) {
-      errorManager.dispatchLoggerMessage(e);
+      dispatchLoggerMessage(e);
       return {
         statusCode: 404,
         body: JSON.stringify({message: 'User not found'})
       };
     }
 
-    const errorResponse = errorManager.errorHandler(e);
+    const errorResponse = errorHandler(e);
     return errorResponse;
   
   }

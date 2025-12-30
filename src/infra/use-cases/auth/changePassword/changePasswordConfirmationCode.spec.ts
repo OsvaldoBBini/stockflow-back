@@ -1,4 +1,4 @@
-import { CodeMismatchException, CognitoIdentityProviderClient, ConfirmSignUpCommand, ForgotPasswordCommand, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ForgotPasswordCommand, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';

@@ -20,7 +20,9 @@ const signUpSchema = z.object({
   firstName: z.string(),
   lastName: z.string()
 });
+
 const logger = new Logger({ serviceName: 'signUp' });
+const { errorHandler, dispatchLoggerMessage } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
 
@@ -59,17 +61,15 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   } catch (e) {
 
-    const errorManager = new ErrorManager(logger);
-
     if (e instanceof UsernameExistsException) {
-      errorManager.dispatchLoggerMessage(e);
+      dispatchLoggerMessage(e);
       return {
         statusCode: 409,
         body: JSON.stringify({ message: 'E-mail already in used' })
       };
     }
     
-    const errorResponse = errorManager.errorHandler(e);
+    const errorResponse = errorHandler(e);
     return errorResponse;
   }
   
