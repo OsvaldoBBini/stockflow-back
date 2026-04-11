@@ -31,6 +31,8 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEventV2) {
 
   try {
+    logger.info('Sign up process started');
+    
     const cognitoClient = new CognitoIdentityProviderClient();
 
     const { 
@@ -39,7 +41,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       firstName, 
       lastName } = signUpSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: {email, firstName, lastName}}));
+    logger.debug({ message: 'Input validation successful', email, firstName, lastName });
 
     const command = new SignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -56,8 +58,11 @@ export async function handler(event: APIGatewayProxyEventV2) {
         }]
     });
 
+    logger.debug({ message: 'Sending SignUp command to Cognito', email });
     const { UserSub } = await cognitoClient.send(command);
 
+    logger.info({ message: 'User registered successfully', userId: UserSub, email });
+    
     return {
       statusCode: 201,
       body: JSON.stringify({user: {id: UserSub}}),

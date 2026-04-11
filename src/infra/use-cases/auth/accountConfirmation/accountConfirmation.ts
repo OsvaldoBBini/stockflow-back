@@ -15,6 +15,8 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEventV2) {
 
   try {
+    logger.info('Account confirmation process started');
+    
     const cognitoClient = new CognitoIdentityProviderClient();
 
     const { 
@@ -22,7 +24,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       confirmationCode
     } = accountConfirmationSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: { email }}));
+    logger.debug({ message: 'Input validation successful', email });
 
     const command = new ConfirmSignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -30,7 +32,10 @@ export async function handler(event: APIGatewayProxyEventV2) {
       ConfirmationCode: confirmationCode
     });
 
+    logger.debug({ message: 'Sending ConfirmSignUp command to Cognito', email });
     await cognitoClient.send(command);
+    
+    logger.info({ message: 'Account confirmed successfully', email });
     
     return {
       statusCode: 200,

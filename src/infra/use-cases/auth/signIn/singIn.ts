@@ -14,10 +14,12 @@ const { errorHandler } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEventV2) {
   try {
+    logger.info('Sign in process started');
+    
     const cognitoClient = new CognitoIdentityProviderClient();
     const { email, password } = signInSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: { email }}));
+    logger.debug({ message: 'Input validation successful', email });
 
     const command = new InitiateAuthCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -28,15 +30,19 @@ export async function handler(event: APIGatewayProxyEventV2) {
       }
     });
 
+    logger.debug({ message: 'Sending InitiateAuth command to Cognito', email });
     const { AuthenticationResult } = await cognitoClient.send(command);
 
     if (!AuthenticationResult) {
+      logger.warn({ message: 'Authentication failed: No authentication result returned', email });
       return {
         statusCode: 401,
         body: JSON.stringify({message: 'Invalid Credentials.'})
       };
     }
 
+    logger.info({ message: 'User authenticated successfully', email });
+    
     return {
       statusCode: 200,
       body: JSON.stringify({

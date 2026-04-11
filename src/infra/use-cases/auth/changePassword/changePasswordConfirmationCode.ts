@@ -15,19 +15,24 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEventV2) {
 
   try {
+    logger.info('Change password confirmation code process started');
+    
     const cognitoClient = new CognitoIdentityProviderClient();
     const { 
       email, 
     } = changePasswordConfirmationCodeSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug(JSON.stringify({inputs: { email }}));
+    logger.debug({ message: 'Input validation successful', email });
 
     const command = new ForgotPasswordCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
     });
 
+    logger.debug({ message: 'Sending ForgotPassword command to Cognito', email });
     await cognitoClient.send(command);
+    
+    logger.info({ message: 'Password reset confirmation code sent successfully', email });
     
     return {
       statusCode: 200,
