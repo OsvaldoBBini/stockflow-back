@@ -1,10 +1,21 @@
 org: osvaldobazzanbini
-service: stockflowback
+service: formsbuilder
 
 provider:
   name: aws
   runtime: nodejs20.x
   architecture: arm64
+  environment:
+      COGNITO_CLIENT_ID: !Ref FormsBuilderUserPoolClient
+      COGNITO_POOL_ID: !Ref FormsBuilderUserPool
+  httpApi:
+    authorizers: 
+      CognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !GetAtt FormsBuilderUserPool.ProviderURL
+        audience:
+          - !Ref FormsBuilderUserPoolClient
 
 package:
   individually: true
@@ -19,9 +30,101 @@ build:
       - '@aws-sdk/*'
 
 functions:
-  hello:
-    handler: src/functions/products/create-product/handler.handler
+  
+  # Authentication
+  forms-builder-sign-up-service:
+    handler: src/infra/use-cases/auth/signUp/signUp.handler
     events:
       - httpApi:
-          path: /
-          method: post
+          path: /auth/signup
+          method: POST
+  
+  forms-builder-sign-in-service:
+    handler: src/infra/use-cases/auth/signIn/signIn.handler
+    events:
+      - httpApi:
+          path: /auth/signin
+          method: POST
+  
+  forms-builder-account-confirmation-service:
+    handler: src/infra/use-cases/auth/accountConfirmation/accountConfirmation.handler
+    events:
+      - httpApi:
+          path: /auth/account-confirmation
+          method: POST
+  
+  forms-builder-change-password-confirmation-code-service:
+    handler: src/infra/use-cases/auth/changePasswordConfirmationCode/changePasswordConfirmationCode.handler
+    events:
+      - httpApi:
+          path: /auth/password/forgot
+          method: POST
+
+  forms-builder-change-password-service:
+    handler: src/infra/use-cases/auth/changePassword/changePassword.handler
+    events:
+      - httpApi:
+          path: /auth/password/reset
+          method: POST
+  
+  forms-builder-refresh-token-service:
+    handler: src/infra/use-cases/auth/refreshToken/refreshToken.handler
+    events:
+      - httpApi:
+          path: /auth/refresh-token
+          method: POST
+  
+  forms-builder-cognito-custom-message:
+    handler: src/infra/use-cases/auth/customMessage/index.handler
+    events:
+      - cognitoUserPool:
+          pool: FormsBuilderUserPool
+          trigger: CustomMessage
+          existing: true
+          forceDeploy: true
+
+resources:
+  Resources:
+
+    FormsBuilderUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        DeletionProtection: ACTIVE
+        UserPoolName: FormsBuilderUserPool
+        MfaConfiguration: OFF
+        AutoVerifiedAttributes: 
+          - email
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: false
+        UsernameAttributes:
+          - email
+        AccountRecoverySetting:
+          RecoveryMechanisms: 
+            - Name: verified_email
+              Priority: 1
+        Policies:
+          PasswordPolicy: 
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireUppercase: true
+            TemporaryPasswordValidityDays: 2
+        Schema:
+          - Name: given_name
+            Mutable: true
+            Required: true
+            AttributeDataType: String
+
+    FormsBuilderUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: FormsBuilderUserPoolClient
+        UserPoolId: !Ref FormsBuilderUserPool
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        AccessTokenValidity: 3
+        RefreshTokenValidity: 48 # 2 days
+        TokenValidityUnits:
+          AccessToken: hours
+          RefreshToken: hours 
