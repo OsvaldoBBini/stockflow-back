@@ -32,49 +32,49 @@ build:
 functions:
   
   # Authentication
-  forms-builder-sign-up-service:
+  sign-up-service:
     handler: src/infra/use-cases/auth/signUp/signUp.handler
     events:
       - httpApi:
           path: /auth/signup
           method: POST
   
-  forms-builder-sign-in-service:
+  sign-in-service:
     handler: src/infra/use-cases/auth/signIn/signIn.handler
     events:
       - httpApi:
           path: /auth/signin
           method: POST
   
-  forms-builder-account-confirmation-service:
+  account-confirmation-service:
     handler: src/infra/use-cases/auth/accountConfirmation/accountConfirmation.handler
     events:
       - httpApi:
           path: /auth/account-confirmation
           method: POST
   
-  forms-builder-change-password-confirmation-code-service:
+  change-password-confirmation-code-service:
     handler: src/infra/use-cases/auth/changePasswordConfirmationCode/changePasswordConfirmationCode.handler
     events:
       - httpApi:
           path: /auth/password/forgot
           method: POST
 
-  forms-builder-change-password-service:
+  change-password-service:
     handler: src/infra/use-cases/auth/changePassword/changePassword.handler
     events:
       - httpApi:
           path: /auth/password/reset
           method: POST
   
-  forms-builder-refresh-token-service:
+  refresh-token-service:
     handler: src/infra/use-cases/auth/refreshToken/refreshToken.handler
     events:
       - httpApi:
           path: /auth/refresh-token
           method: POST
   
-  forms-builder-cognito-custom-message:
+  cognito-custom-message:
     handler: src/infra/use-cases/auth/customMessage/index.handler
     events:
       - cognitoUserPool:
