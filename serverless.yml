@@ -33,7 +33,7 @@ functions:
   
   # Authentication
   sign-up-service:
-    handler: src/infra/use-cases/auth/singUp/signUp.handler
+    handler: src/infra/use-cases/auth/signUp/signUp.handler
     events:
       - httpApi:
           path: /auth/signup
