@@ -4,7 +4,8 @@ import {
   InvalidPasswordException,
   UsernameExistsException, 
   UserNotFoundException, 
-  UserNotConfirmedException 
+  UserNotConfirmedException, 
+  NotAuthorizedException
 } from '@aws-sdk/client-cognito-identity-provider';
 import z, { ZodError } from 'zod';
 
@@ -69,6 +70,14 @@ export class ErrorManager {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Invalid Password' })
+      };
+    }
+
+    if (e instanceof NotAuthorizedException) {
+      this.dispatchLoggerMessage(e);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Incorrect username or password' })
       };
     }
       
