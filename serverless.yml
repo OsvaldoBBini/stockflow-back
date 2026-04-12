@@ -89,6 +89,8 @@ functions:
       - httpApi:
           path: /profile/me
           method: GET
+          authorizer: 
+            name: CognitoAuthorizer
 
 resources:
   Resources:

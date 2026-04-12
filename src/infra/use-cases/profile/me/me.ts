@@ -9,9 +9,8 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEvent) {
 
   try {
-    
     logger.debug({ message: 'Get request context', requestContext: event.requestContext });
-
+    
     const cognitoClient = new CognitoIdentityProviderClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
