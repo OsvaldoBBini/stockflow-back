@@ -21,8 +21,7 @@ const signUpSchema = z.object({
       /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, 
       { message: 'Password must contain at least one special character.' }
     ),
-  firstName: z.string(),
-  lastName: z.string()
+  fullName: z.string(),
 });
 
 const logger = new Logger({ serviceName: 'signUp' });
@@ -38,10 +37,9 @@ export async function handler(event: APIGatewayProxyEventV2) {
     const { 
       email, 
       password, 
-      firstName, 
-      lastName } = signUpSchema.parse(JSON.parse(event.body || ''));
+      fullName } = signUpSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email, firstName, lastName });
+    logger.debug({ message: 'Input validation successful', email, fullName });
 
     const command = new SignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -50,11 +48,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       UserAttributes: [
         {
           Name: 'given_name',
-          Value: firstName
-        },
-        {
-          Name: 'family_name',
-          Value: lastName
+          Value: fullName
         }]
     });
 

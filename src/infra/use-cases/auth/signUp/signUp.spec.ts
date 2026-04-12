@@ -18,8 +18,7 @@ describe('signUp', () => {
     body: JSON.stringify({
       email: 'test@example.com',
       password: 'ValidPassword1!',
-      firstName: 'TestFirstName',
-      lastName: 'TestLastName',
+      fullName: 'TestFirstName'
     }),
   } as APIGatewayProxyEventV2;
 
@@ -68,12 +67,7 @@ describe('signUp', () => {
               'Invalid email format.',
             ],
           },
-          'firstName': {
-            'errors':  [
-              'Invalid input: expected string, received undefined',
-            ],
-          },
-          'lastName': {
+          'fullName': {
             'errors':  [
               'Invalid input: expected string, received undefined',
             ],

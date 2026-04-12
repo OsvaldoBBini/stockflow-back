@@ -121,10 +121,6 @@ resources:
             Mutable: true
             Required: true
             AttributeDataType: String
-          - Name: family_name
-            Mutable: true
-            Required: true
-            AttributeDataType: String
 
     FormsBuilderUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
