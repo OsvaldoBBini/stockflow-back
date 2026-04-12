@@ -1,5 +1,11 @@
 import { Logger } from '@aws-lambda-powertools/logger';
-import { CodeMismatchException, InvalidPasswordException, UsernameExistsException, UserNotFoundException } from '@aws-sdk/client-cognito-identity-provider';
+import { 
+  CodeMismatchException, 
+  InvalidPasswordException,
+  UsernameExistsException, 
+  UserNotFoundException, 
+  UserNotConfirmedException 
+} from '@aws-sdk/client-cognito-identity-provider';
 import z, { ZodError } from 'zod';
 
 export class ErrorManager {
@@ -42,6 +48,14 @@ export class ErrorManager {
       };
     }
 
+    if (e instanceof UserNotConfirmedException) {
+      this.dispatchLoggerMessage(e);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'User not confirmed' })
+      };
+    }
+
     if (e instanceof CodeMismatchException) {
       this.dispatchLoggerMessage(e);
       return {
@@ -53,7 +67,7 @@ export class ErrorManager {
     if (e instanceof InvalidPasswordException) {
       this.dispatchLoggerMessage(e);
       return {
-        statusCode: 404,
+        statusCode: 400,
         body: JSON.stringify({ message: 'Invalid Password' })
       };
     }

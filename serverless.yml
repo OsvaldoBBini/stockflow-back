@@ -73,7 +73,7 @@ functions:
       - httpApi:
           path: /auth/refresh-token
           method: POST
-  
+
   cognito-custom-message:
     handler: src/infra/use-cases/auth/customMessage/index.handler
     events:
