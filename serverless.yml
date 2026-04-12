@@ -54,7 +54,7 @@ functions:
           method: POST
   
   change-password-confirmation-code-service:
-    handler: src/infra/use-cases/auth/changePasswordConfirmationCode/changePasswordConfirmationCode.handler
+    handler: src/infra/use-cases/auth/changePassword/changePasswordConfirmationCode.handler
     events:
       - httpApi:
           path: /auth/password/forgot

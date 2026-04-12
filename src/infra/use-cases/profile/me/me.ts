@@ -14,7 +14,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userId = (event.requestContext as any).authorizer.jwt.claims.sub;
 
-    logger.debug({ message: 'Get profile for user', userId });
+    logger.debug({ message: 'Get request context', requestContext: event.requestContext });
     
     const command = new AdminGetUserCommand({
       Username: userId,
