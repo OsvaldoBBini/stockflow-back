@@ -83,6 +83,13 @@ functions:
           existing: true
           forceDeploy: true
 
+  get-profile-service:
+    handler: src/infra/use-cases/profile/me/me.handler
+    events:
+      - httpApi:
+          path: /profile/me
+          method: GET
+
 resources:
   Resources:
 
@@ -111,6 +118,10 @@ resources:
             TemporaryPasswordValidityDays: 2
         Schema:
           - Name: given_name
+            Mutable: true
+            Required: true
+            AttributeDataType: String
+          - Name: family_name
             Mutable: true
             Required: true
             AttributeDataType: String

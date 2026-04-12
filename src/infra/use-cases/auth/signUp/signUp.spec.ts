@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { handler } from './singUp';
+import { handler } from './signUp';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import {
