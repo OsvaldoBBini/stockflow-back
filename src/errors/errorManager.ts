@@ -22,70 +22,45 @@ export class ErrorManager {
     this.logger.error(JSON.stringify({error: e.stack}));
   };
 
-
-  public errorHandler = (e: unknown) => {
-
-    if(e instanceof ZodError) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: z.treeifyError(e) })
-      };
-    }
-
-    if (e instanceof UsernameExistsException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 409,
-        body: JSON.stringify({ message: 'E-mail already in used' })
-      };
-    }
-
-    if (e instanceof UserNotFoundException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: 'User not found' })
-      };
-    }
-
-    if (e instanceof UserNotConfirmedException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'User not confirmed' })
-      };
-    }
-
-    if (e instanceof CodeMismatchException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: 'The confirmation code is not valid' })
-      };
-    }
-
-    if (e instanceof InvalidPasswordException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Invalid Password' })
-      };
-    }
-
-    if (e instanceof NotAuthorizedException) {
-      this.dispatchLoggerMessage(e);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Incorrect username or password' })
-      };
-    }
-      
-    this.dispatchLoggerMessage(e);
+  private throwError = ( statusCode: number, message: string | { errors: string[] }) => {
     return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Something went wrong' })
+      statusCode,
+      body: JSON.stringify({ message })
     };
   };
 
+  public errorHandler = (e: unknown) => {
+
+    this.dispatchLoggerMessage(e);
+
+    if(e instanceof ZodError) {
+      return this.throwError(400, z.treeifyError(e));
+    }
+
+    if (e instanceof UsernameExistsException) {
+      return this.throwError(409, 'E-mail already in used');
+    }
+
+    if (e instanceof UserNotFoundException) {
+      return this.throwError(404, 'User not found');
+    }
+
+    if (e instanceof UserNotConfirmedException) {
+      return this.throwError(400, 'User not confirmed');
+    }
+
+    if (e instanceof CodeMismatchException) {
+      return this.throwError(404, 'The confirmation code is not valid');
+    }
+
+    if (e instanceof InvalidPasswordException) {
+      return this.throwError(400, 'Invalid Password');
+    }
+
+    if (e instanceof NotAuthorizedException) {
+      return this.throwError(401, 'Incorrect username or password');
+    }
+      
+    return this.throwError(500, 'Something went wrong');
+  };
 }
