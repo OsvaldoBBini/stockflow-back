@@ -2,6 +2,7 @@ import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dyn
 import { DatabaseGatewayInterface, dynamoGateway } from '../../../adapters/database/dynamo';
 import { CustomerDomainInterface, CustomerInterface } from '../../../domain/entities/customer/customer';
 import { CustomerRepositoryInterface } from '../../../domain/entities/customer/customerRepository';
+import { DatabaseError } from '../../../../errors/errorManager';
 
 export class CustomerRepository implements CustomerRepositoryInterface {
 
@@ -14,37 +15,45 @@ export class CustomerRepository implements CustomerRepositoryInterface {
   }
 
   async getCustomer(userId: string, cpf: string): Promise<CustomerDomainInterface | undefined> {
-    const command = new GetCommand({
-      TableName: this.tableName,
-      Key: {
-        PK: `USER#${userId}#CUSTOMERS`,
-        SK: `CUSTOMER#${cpf}`
-      }
-    });
-
-    const { Item: response } = await this.dbClient.send(command);
-
-    const customerData: CustomerDomainInterface | undefined = response && { 
-      userId: response.PK.split('#')[1], 
-      email: response.email, 
-      fullName: response.fullName,
-      cpf: response.cpf, 
-      phoneNumber: response.phoneNumber };
-
-    return customerData;
+    try {
+      const command = new GetCommand({
+        TableName: this.tableName,
+        Key: {
+          PK: `USER#${userId}#CUSTOMERS`,
+          SK: `CUSTOMER#${cpf}`
+        }
+      });
+  
+      const { Item: response } = await this.dbClient.send(command);
+  
+      const customerData: CustomerDomainInterface | undefined = response && { 
+        userId: response.PK.split('#')[1], 
+        email: response.email, 
+        fullName: response.fullName,
+        cpf: response.cpf, 
+        phoneNumber: response.phoneNumber };
+  
+      return customerData;
+    } catch (e) {
+      throw new DatabaseError(String(e));
+    }
   }
 
   async storeCustomer(userId: string, customerData: CustomerInterface): Promise<void> {
-    const command = new PutCommand({
-      TableName: this.tableName,
-      Item: {
-        PK: `USER#${userId}#CUSTOMERS`,
-        SK: `CUSTOMER#${customerData.cpf}`,
-        ...customerData
-      }
-    });
-    await this.dbClient.send(command);
-    return ;
+    try {
+      const command = new PutCommand({
+        TableName: this.tableName,
+        Item: {
+          PK: `USER#${userId}#CUSTOMERS`,
+          SK: `CUSTOMER#${customerData.cpf}`,
+          ...customerData
+        }
+      });
+      await this.dbClient.send(command);
+      return ;
+    } catch (e) {
+      throw new DatabaseError(String(e));
+    }
   }
 }
 

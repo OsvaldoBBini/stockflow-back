@@ -9,6 +9,14 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import z, { ZodError } from 'zod';
 
+
+export class DatabaseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DatabaseError';
+  }
+}
+
 export class ErrorManager {
 
   private logger: Logger;
@@ -32,6 +40,10 @@ export class ErrorManager {
   public errorHandler = (e: unknown) => {
 
     this.dispatchLoggerMessage(e);
+
+    if (e instanceof DatabaseError) {
+      return this.throwError(500, 'Database error occurred');
+    }
 
     if(e instanceof ZodError) {
       return this.throwError(400, z.treeifyError(e));
