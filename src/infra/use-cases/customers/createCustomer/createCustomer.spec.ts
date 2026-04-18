@@ -1,16 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mockClient } from 'aws-sdk-client-mock';
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent } from 'aws-lambda/trigger/api-gateway-proxy';
 import { handler } from './createCustomer';
+import * as customerRepositoryModule from '../repository/customerRepository';
 
-const dbMock = mockClient(DynamoDBDocumentClient);
+// Mock the entire repository module
+vi.mock('../repository/customerRepository', () => ({
+  customerRepository: {
+    getCustomer: vi.fn(),
+    storeCustomer: vi.fn()
+  }
+}));
 
-describe('createCustomer', () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockCustomerRepository = customerRepositoryModule.customerRepository as any;
+
+describe('createCustomer handler', () => {
 
   beforeEach(() => {
-    dbMock.reset();
     vi.clearAllMocks();
+    mockCustomerRepository.getCustomer.mockReset();
+    mockCustomerRepository.storeCustomer.mockReset();
   });
 
   it('should create a new customer successfully', async () => {
@@ -36,23 +45,25 @@ describe('createCustomer', () => {
       }
     } as unknown as APIGatewayProxyEvent;
 
-    // Mock getCustomer to return undefined (customer doesn't exist)
-    dbMock.on(GetCommand).resolves({
-      $metadata: { httpStatusCode: 200 }
-    });
-
-    // Mock storeCustomer to succeed
-    dbMock.on(PutCommand).resolves({
-      $metadata: { httpStatusCode: 200 }
-    });
+    // Mock repository methods
+    mockCustomerRepository.getCustomer.mockResolvedValueOnce(undefined);
+    mockCustomerRepository.storeCustomer.mockResolvedValueOnce(undefined);
 
     const response = await handler(event);
-
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(201);
     expect(responseBody.message).toBe('Customer created successfully');
     expect(responseBody.cpf).toBe(mockCpf);
+    
+    // Verify repository was called correctly
+    expect(mockCustomerRepository.getCustomer).toHaveBeenCalledWith(mockUserId, mockCpf);
+    expect(mockCustomerRepository.storeCustomer).toHaveBeenCalledWith(mockUserId, {
+      email: 'john.doe@example.com',
+      cpf: mockCpf,
+      phoneNumber: '11987654321',
+      fullName: 'John Doe'
+    });
   });
 
   it('should return 409 when customer with same CPF already exists', async () => {
@@ -79,16 +90,12 @@ describe('createCustomer', () => {
     } as unknown as APIGatewayProxyEvent;
 
     // Mock getCustomer to return existing customer
-    dbMock.on(GetCommand).resolves({
-      Item: {
-        PK: `USER#${mockUserId}#CUSTOMERS`,
-        SK: `CUSTOMER#${mockCpf}`,
-        email: 'john.doe@example.com',
-        cpf: mockCpf,
-        phoneNumber: '11987654321',
-        fullName: 'John Doe'
-      },
-      $metadata: { httpStatusCode: 200 }
+    mockCustomerRepository.getCustomer.mockResolvedValueOnce({
+      userId: mockUserId,
+      email: 'john.doe@example.com',
+      cpf: mockCpf,
+      phoneNumber: '11987654321',
+      fullName: 'John Doe'
     });
 
     const response = await handler(event);
@@ -96,6 +103,9 @@ describe('createCustomer', () => {
 
     expect(response.statusCode).toBe(409);
     expect(responseBody.message).toBe('Customer with this CPF already exists');
+    
+    // Verify storeCustomer was NOT called
+    expect(mockCustomerRepository.storeCustomer).not.toHaveBeenCalled();
   });
 
   it('should return error when CPF format is invalid', async () => {
@@ -265,13 +275,8 @@ describe('createCustomer', () => {
       }
     } as unknown as APIGatewayProxyEvent;
 
-    dbMock.on(GetCommand).resolves({
-      $metadata: { httpStatusCode: 200 }
-    });
-
-    dbMock.on(PutCommand).resolves({
-      $metadata: { httpStatusCode: 200 }
-    });
+    mockCustomerRepository.getCustomer.mockResolvedValueOnce(undefined);
+    mockCustomerRepository.storeCustomer.mockResolvedValueOnce(undefined);
 
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
@@ -299,7 +304,6 @@ describe('createCustomer', () => {
     } as unknown as APIGatewayProxyEvent;
 
     const response = await handler(event);
-    // const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
   });

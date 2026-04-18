@@ -3,7 +3,7 @@ import { DatabaseGatewayInterface, dynamoGateway } from '../../../adapters/datab
 import { CustomerDomainInterface, CustomerInterface } from '../../../domain/entities/customer/customer';
 import { CustomerRepositoryInterface } from '../../../domain/entities/customer/customerRepository';
 
-class CustomerRepository implements CustomerRepositoryInterface {
+export class CustomerRepository implements CustomerRepositoryInterface {
 
   private dbClient: DynamoDBDocumentClient;
   private tableName: string;
