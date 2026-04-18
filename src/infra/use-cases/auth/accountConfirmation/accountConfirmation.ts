@@ -6,7 +6,7 @@ import { ErrorManager } from '../../../../errors/errorManager';
 
 const accountConfirmationSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
-  confirmationCode: z.string({message: 'Invalid confirmation code'}),
+  confirmationCode: z.string({message: 'Invalid confirmation code'}).max(6, {message: 'Confirmation code must be at most 6 characters long.'}),
 });
 
 const logger = new Logger({ serviceName: 'accountConfirmation' });

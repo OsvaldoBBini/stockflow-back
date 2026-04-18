@@ -6,7 +6,7 @@ import { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 const changePasswordSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
-  confirmationCode: z.string(),
+  confirmationCode: z.string().max(6, {message: 'Confirmation code must be at most 6 characters long.'}),
   newPassword: z.string()
     .min(8, {message: 'Password must be at least 8 characters long.'})
     .max(20, {message: 'Password must be at most 20 characters long.'})

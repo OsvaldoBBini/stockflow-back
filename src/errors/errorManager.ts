@@ -37,6 +37,10 @@ export class ErrorManager {
       return this.throwError(400, z.treeifyError(e));
     }
 
+    if (e instanceof SyntaxError) {
+      return this.throwError(400, 'Invalid request body format');
+    }
+
     if (e instanceof UsernameExistsException) {
       return this.throwError(409, 'E-mail already in used');
     }

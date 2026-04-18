@@ -21,7 +21,7 @@ const signUpSchema = z.object({
       /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, 
       { message: 'Password must contain at least one special character.' }
     ),
-  fullName: z.string(),
+  fullName: z.string().min(2, {message: 'Full name must be at least 2 characters long.'}).max(50, {message: 'Full name must be at most 50 characters long.'}),
 });
 
 const logger = new Logger({ serviceName: 'signUp' });

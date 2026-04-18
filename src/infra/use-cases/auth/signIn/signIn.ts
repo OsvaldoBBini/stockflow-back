@@ -6,7 +6,7 @@ import { ErrorManager } from '../../../../errors/errorManager';
 
 const signInSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
-  password: z.string({message: 'Invalid password'}),
+  password: z.string({message: 'Invalid password'}).min(8, {message: 'Password must be at least 8 characters long.'}).max(20, {message: 'Password must be at most 20 characters long.'}),
 });
 
 const logger = new Logger({ serviceName: 'signIn' });
