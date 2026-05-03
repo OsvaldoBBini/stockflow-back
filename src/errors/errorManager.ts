@@ -33,7 +33,7 @@ export class ErrorManager {
   private throwError = ( statusCode: number, message: string | { errors: string[] }) => {
     return {
       statusCode,
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ data: { message } })
     };
   };
 

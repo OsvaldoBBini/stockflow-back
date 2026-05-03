@@ -34,15 +34,17 @@ export async function handler(event: APIGatewayProxyEventV2) {
       logger.warn({ message: 'Refresh token is invalid or has expired', refreshToken });
       return {
         statusCode: 401,
-        body: JSON.stringify({message: 'Invalid refresh token.'})
+        body: JSON.stringify({ data: { message: 'Invalid refresh token.' } })
       };
     }
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        accessToken: AuthenticationResult.AccessToken,
-        refreshToken: AuthenticationResult.RefreshToken
+        data: {
+          accessToken: AuthenticationResult.AccessToken,
+          refreshToken: AuthenticationResult.RefreshToken
+        }
       })
     };
 

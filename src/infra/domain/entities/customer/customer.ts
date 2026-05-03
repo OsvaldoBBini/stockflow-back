@@ -9,7 +9,7 @@ export interface CustomerDomainInterface extends CustomerInterface {
   userId: string;
 }
 
-export interface CustomerRepositoryInterface {
+export interface CustomerPersistenceInterface {
   PK: string;
   SK: string;
   email?: string;

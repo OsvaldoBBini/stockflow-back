@@ -47,7 +47,7 @@ describe('changePassword', () => {
 
     expect(response.statusCode).toBe(201);
     expect(JSON.parse(response.body)).toEqual({
-      user: { email: JSON.parse(event.body || '').email }
+      data: { user: { email: JSON.parse(event.body || '').email } }
     });
   });
 
@@ -66,16 +66,18 @@ describe('changePassword', () => {
   
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message: {
-        'errors': [],
-        'properties': {
-          'newPassword': {
-            'errors': [
-              'Password must be at least 8 characters long.',
-              'Password must contain at least one uppercase letter.',
-              'Password must contain at least one number.',
-              'Password must contain at least one special character.',
-            ]
+      data: {
+        message: {
+          'errors': [],
+          'properties': {
+            'newPassword': {
+              'errors': [
+                'Password must be at least 8 characters long.',
+                'Password must contain at least one uppercase letter.',
+                'Password must contain at least one number.',
+                'Password must contain at least one special character.',
+              ]
+            }
           }
         }
       },
@@ -89,7 +91,7 @@ describe('changePassword', () => {
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Something went wrong',
+      data: { message: 'Something went wrong' },
     });
   });
 

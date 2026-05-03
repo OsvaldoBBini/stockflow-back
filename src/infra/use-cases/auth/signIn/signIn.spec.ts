@@ -46,8 +46,10 @@ describe('signIn', () => {
 
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toEqual({
-      accessToken: mockTokens.AccessToken,
-      refreshToken: mockTokens.RefreshToken,
+      data: {
+        accessToken: mockTokens.AccessToken,
+        refreshToken: mockTokens.RefreshToken,
+      }
     });
   });
 
@@ -61,7 +63,7 @@ describe('signIn', () => {
 
     expect(response.statusCode).toBe(401);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Invalid Credentials.'
+      data: { message: 'Invalid Credentials.' }
     });
   });
 
@@ -75,21 +77,23 @@ describe('signIn', () => {
 
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message:  {
-        'errors':  [],
-        'properties':  {
-          'email':  {
-            'errors':  [
-              'Invalid email format.',
-            ],
-          },
-          'password':  {
-            'errors':  [
-              'Invalid password',
-            ],
+      data: {
+        message: {
+          'errors':  [],
+          'properties':  {
+            'email':  {
+              'errors':  [
+                'Invalid email format.',
+              ],
+            },
+            'password':  {
+              'errors':  [
+                'Invalid password',
+              ],
+            },
           },
         },
-      },
+      }
     });
   });
 
@@ -105,7 +109,7 @@ describe('signIn', () => {
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Something went wrong',
+      data: { message: 'Something went wrong' },
     });
   });
 

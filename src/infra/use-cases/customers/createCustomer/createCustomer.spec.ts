@@ -53,8 +53,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(201);
-    expect(responseBody.message).toBe('Customer created successfully');
-    expect(responseBody.cpf).toBe(mockCpf);
+    expect(responseBody.data.customer.cpf).toBe(mockCpf);
     
     // Verify repository was called correctly
     expect(mockCustomerRepository.getCustomer).toHaveBeenCalledWith(mockUserId, mockCpf);
@@ -102,7 +101,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(409);
-    expect(responseBody.message).toBe('Customer with this CPF already exists');
+    expect(responseBody.data.message).toBe('Customer with this CPF already exists');
     
     // Verify storeCustomer was NOT called
     expect(mockCustomerRepository.storeCustomer).not.toHaveBeenCalled();
@@ -134,7 +133,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(responseBody.message.properties).toHaveProperty('cpf');
+    expect(responseBody.data.message.properties).toHaveProperty('cpf');
   });
 
   it('should return error when phone number format is invalid', async () => {
@@ -163,7 +162,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(responseBody.message.properties).toHaveProperty('phoneNumber');
+    expect(responseBody.data.message.properties).toHaveProperty('phoneNumber');
   });
 
   it('should return error when email format is invalid', async () => {
@@ -192,7 +191,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(responseBody.message.properties).toHaveProperty('email');
+    expect(responseBody.data.message.properties).toHaveProperty('email');
   });
 
   it('should return error when fullName is too short', async () => {
@@ -221,7 +220,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(responseBody.message.properties).toHaveProperty('fullName');
+    expect(responseBody.data.message.properties).toHaveProperty('fullName');
   });
 
   it('should return error when fullName is too long', async () => {
@@ -250,7 +249,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(400);
-    expect(responseBody.message.properties).toHaveProperty('fullName');
+    expect(responseBody.data.message.properties).toHaveProperty('fullName');
   });
 
   it('should create customer with optional email field omitted', async () => {
@@ -282,8 +281,7 @@ describe('createCustomer handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(201);
-    expect(responseBody.message).toBe('Customer created successfully');
-    expect(responseBody.cpf).toBe(mockCpf);
+    expect(responseBody.data.customer.cpf).toBe(mockCpf);
   });
 
   it('should return error when body is empty', async () => {

@@ -31,7 +31,7 @@ export async function handler(event: APIGatewayProxyEvent) {
     if (customerExists) {
       return {
         statusCode: 409,
-        body: JSON.stringify({ message: 'Customer with this CPF already exists' }),
+        body: JSON.stringify({data: { message: 'Customer with this CPF already exists' } }),
       };
     }
 
@@ -41,8 +41,7 @@ export async function handler(event: APIGatewayProxyEvent) {
       statusCode: 201,
       body: JSON.stringify(
         { 
-          message: 'Customer created successfully', 
-          cpf 
+          data: { customer: { email, cpf, phoneNumber, fullName } }
         }
       ),
     };

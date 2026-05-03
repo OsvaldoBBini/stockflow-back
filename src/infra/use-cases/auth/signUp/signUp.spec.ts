@@ -45,7 +45,7 @@ describe('signUp', () => {
 
     expect(response.statusCode).toBe(201);
     expect(JSON.parse(response.body)).toEqual({
-      user: { id: mockUserSub }
+      data: { user: { id: mockUserSub } }
     });
   });
 
@@ -59,26 +59,28 @@ describe('signUp', () => {
   
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message: {
-        'errors': [],
-        'properties': {
-          'email': {
-            'errors':  [
-              'Invalid email format.',
-            ],
-          },
-          'fullName': {
-            'errors':  [
-              'Invalid input: expected string, received undefined',
-            ],
-          },
-          'password': {
-            'errors':  [
-              'Invalid input: expected string, received undefined',
-            ],
+      data: {
+        message: {
+          'errors': [],
+          'properties': {
+            'email': {
+              'errors':  [
+                'Invalid email format.',
+              ],
+            },
+            'fullName': {
+              'errors':  [
+                'Invalid input: expected string, received undefined',
+              ],
+            },
+            'password': {
+              'errors':  [
+                'Invalid input: expected string, received undefined',
+              ],
+            },
           },
         },
-      },
+      }
     });
   });
 
@@ -93,16 +95,18 @@ describe('signUp', () => {
   
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body)).toEqual({
-      message: {
-        'errors': [],
-        'properties': {
-          'password': {
-            'errors': [
-              'Password must be at least 8 characters long.',
-              'Password must contain at least one uppercase letter.',
-              'Password must contain at least one number.',
-              'Password must contain at least one special character.',
-            ]
+      data: {
+        message: {
+          'errors': [],
+          'properties': {
+            'password': {
+              'errors': [
+                'Password must be at least 8 characters long.',
+                'Password must contain at least one uppercase letter.',
+                'Password must contain at least one number.',
+                'Password must contain at least one special character.',
+              ]
+            }
           }
         }
       },
@@ -118,7 +122,7 @@ describe('signUp', () => {
 
     expect(response.statusCode).toBe(409);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'E-mail already in used'
+      data: { message: 'E-mail already in used' }
     });
   });
 
@@ -129,7 +133,7 @@ describe('signUp', () => {
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Something went wrong',
+      data: { message: 'Something went wrong' },
     });
   });
 

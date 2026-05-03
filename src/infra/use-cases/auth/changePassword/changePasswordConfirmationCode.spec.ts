@@ -33,7 +33,9 @@ describe('accountConfirmation', () => {
     const response = await handler(event);
 
     expect(response.statusCode).toBe(200);
-
+    expect(JSON.parse(response.body)).toEqual({
+      data: { user: { email: 'test@example.com' } }
+    });
   });
 
   it('should return a 404 with an error message indicating a not exist user', async () => {
@@ -44,7 +46,7 @@ describe('accountConfirmation', () => {
     const response = await handler(event);
     expect(response.statusCode).toBe(404);    
     expect(JSON.parse(response.body)).toEqual({
-      message: 'User not found'
+      data: { message: 'User not found' }
     });
   });
 

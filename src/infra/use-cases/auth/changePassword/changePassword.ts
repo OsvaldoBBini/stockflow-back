@@ -52,7 +52,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     
     return {
       statusCode: 201,
-      body: JSON.stringify({user: { email }})
+      body: JSON.stringify({ data: { user: { email } } })
     };
 
   } catch (e) {

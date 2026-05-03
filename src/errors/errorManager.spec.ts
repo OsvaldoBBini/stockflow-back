@@ -25,7 +25,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(500);
-      expect(JSON.parse(response.body).message).toBe('Database error occurred');
+      expect(JSON.parse(response.body).data.message).toBe('Database error occurred');
     });
 
     it('should log DatabaseError correctly', () => {
@@ -51,6 +51,7 @@ describe('ErrorManager', () => {
       if (!result.success) {
         const response = errorManager.errorHandler(result.error);
         expect(response.statusCode).toBe(400);
+        expect(JSON.parse(response.body).data).toHaveProperty('message');
       }
     });
   });
@@ -66,7 +67,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(404);
-      expect(JSON.parse(response.body).message).toBe('User not found');
+      expect(JSON.parse(response.body).data.message).toBe('User not found');
     });
 
     it('should return 409 for UsernameExistsException', () => {
@@ -78,7 +79,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(409);
-      expect(JSON.parse(response.body).message).toBe('E-mail already in used');
+      expect(JSON.parse(response.body).data.message).toBe('E-mail already in used');
     });
 
     it('should return 400 for UserNotConfirmedException', () => {
@@ -90,7 +91,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(400);
-      expect(JSON.parse(response.body).message).toBe('User not confirmed');
+      expect(JSON.parse(response.body).data.message).toBe('User not confirmed');
     });
 
     it('should return 404 for CodeMismatchException', () => {
@@ -102,7 +103,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(404);
-      expect(JSON.parse(response.body).message).toBe('The confirmation code is not valid');
+      expect(JSON.parse(response.body).data.message).toBe('The confirmation code is not valid');
     });
 
     it('should return 400 for InvalidPasswordException', () => {
@@ -114,7 +115,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(400);
-      expect(JSON.parse(response.body).message).toBe('Invalid Password');
+      expect(JSON.parse(response.body).data.message).toBe('Invalid Password');
     });
 
     it('should return 401 for NotAuthorizedException', () => {
@@ -126,7 +127,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(401);
-      expect(JSON.parse(response.body).message).toBe('Incorrect username or password');
+      expect(JSON.parse(response.body).data.message).toBe('Incorrect username or password');
     });
   });
 
@@ -138,7 +139,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(400);
-      expect(JSON.parse(response.body).message).toBe('Invalid request body format');
+      expect(JSON.parse(response.body).data.message).toBe('Invalid request body format');
     });
 
     it('should return 500 for unknown errors', () => {
@@ -147,7 +148,7 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
 
       expect(response.statusCode).toBe(500);
-      expect(JSON.parse(response.body).message).toBe('Something went wrong');
+      expect(JSON.parse(response.body).data.message).toBe('Something went wrong');
     });
   });
 
@@ -173,7 +174,8 @@ describe('ErrorManager', () => {
       const response = errorManager.errorHandler(error);
       const body = JSON.parse(response.body);
 
-      expect(body).toHaveProperty('message');
+      expect(body).toHaveProperty('data');
+      expect(body.data).toHaveProperty('message');
     });
   });
 });

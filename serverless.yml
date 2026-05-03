@@ -110,6 +110,15 @@ functions:
           method: POST
           authorizer: 
             name: CognitoAuthorizer
+  
+  get-customers-service:
+    handler: src/infra/use-cases/customers/getCustomers/getCustomers.handler
+    events:
+      - httpApi:
+          path: /customer
+          method: GET
+          authorizer: 
+            name: CognitoAuthorizer
 
 resources:
   Resources:

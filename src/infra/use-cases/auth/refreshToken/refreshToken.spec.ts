@@ -44,8 +44,10 @@ describe('refreshToken', () => {
 
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toEqual({
-      accessToken: mockTokens.AccessToken,
-      refreshToken: mockTokens.RefreshToken,
+      data: {
+        accessToken: mockTokens.AccessToken,
+        refreshToken: mockTokens.RefreshToken,
+      }
     });
   });
 
@@ -58,7 +60,7 @@ describe('refreshToken', () => {
 
     expect(response.statusCode).toBe(401);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Invalid refresh token.'
+      data: { message: 'Invalid refresh token.' }
     });
   });
 
@@ -68,7 +70,7 @@ describe('refreshToken', () => {
 
     expect(response.statusCode).toBe(400);
     const responseBody = JSON.parse(response.body);
-    expect(responseBody.message.properties.refreshToken).toBeDefined();
+    expect(responseBody.data.message.properties.refreshToken).toBeDefined();
   });
 
   it('should return a 500 when Cognito service fails', async () => {
@@ -79,7 +81,7 @@ describe('refreshToken', () => {
 
     expect(response.statusCode).toBe(500);
     expect(JSON.parse(response.body)).toEqual({
-      message: 'Something went wrong',
+      data: { message: 'Something went wrong' },
     });
   });
 

@@ -37,7 +37,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       logger.warn({ message: 'Authentication failed: No authentication result returned', email });
       return {
         statusCode: 401,
-        body: JSON.stringify({message: 'Invalid Credentials.'})
+        body: JSON.stringify({ data: { message: 'Invalid Credentials.' } })
       };
     }
 
@@ -46,8 +46,10 @@ export async function handler(event: APIGatewayProxyEventV2) {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        accessToken: AuthenticationResult.AccessToken,
-        refreshToken: AuthenticationResult.RefreshToken
+        data: {
+          accessToken: AuthenticationResult.AccessToken,
+          refreshToken: AuthenticationResult.RefreshToken
+        }
       })
     };
 

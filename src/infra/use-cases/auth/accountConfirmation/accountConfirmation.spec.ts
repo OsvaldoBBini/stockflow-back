@@ -34,7 +34,9 @@ describe('accountConfirmation', () => {
     const response = await handler(event);
 
     expect(response.statusCode).toBe(200);
-
+    expect(JSON.parse(response.body)).toEqual({
+      data: { user: { email: 'test@example.com' } }
+    });
   });
 
   it('should return a 409 with an error message indicating a invalid confirmation code', async () => {
@@ -45,7 +47,7 @@ describe('accountConfirmation', () => {
     const response = await handler(event);
     expect(response.statusCode).toBe(404);    
     expect(JSON.parse(response.body)).toEqual({
-      message: 'The confirmation code is not valid'
+      data: { message: 'The confirmation code is not valid' }
     });
   });
 
