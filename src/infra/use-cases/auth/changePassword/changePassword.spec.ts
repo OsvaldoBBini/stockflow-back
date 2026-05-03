@@ -34,14 +34,7 @@ describe('changePassword', () => {
 
   it('should change the user password', async () => {
 
-    const body = JSON.parse(event.body || '');
-
-    cognitoMock.on(ConfirmForgotPasswordCommand).resolves({
-      ClientId: process.env.COGNITO_CLIENT_ID,
-      Username: body.email,
-      ConfirmationCode: body.confirmationCode,
-      Password: body.newPassword
-    });
+    cognitoMock.on(ConfirmForgotPasswordCommand).resolves({});
 
     const response = await handler(event);
 
@@ -54,12 +47,7 @@ describe('changePassword', () => {
   it('should return a 400 with an error message indicating invalid password', async () => {
     const body = JSON.parse(event.body || '');
     
-    cognitoMock.on(ConfirmForgotPasswordCommand).resolves({
-      ClientId: process.env.COGNITO_CLIENT_ID,
-      Username: body.email,
-      ConfirmationCode: body.confirmationCode,
-      Password: body.newPassword
-    });
+    cognitoMock.on(ConfirmForgotPasswordCommand).resolves({});
   
     const emptyBodyEvent = { body: JSON.stringify({...body, newPassword: ''}) } as APIGatewayProxyEventV2;
     const response = await handler(emptyBodyEvent);
