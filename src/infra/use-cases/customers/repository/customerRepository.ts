@@ -1,4 +1,3 @@
-import { DynamoDBDocumentClient, GetCommand,QueryCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { DatabaseGatewayInterface, dynamoGateway } from '../../../adapters/database/dynamo';
 import { CustomerDomainInterface, CustomerInterface, CustomerPersistenceInterface } from '../../../domain/entities/customer/customer';
 import { CustomerRepositoryInterface } from '../../../domain/entities/customer/customerRepository';
@@ -6,36 +5,64 @@ import { DatabaseError } from '../../../../errors/errorManager';
 
 export class CustomerRepository implements CustomerRepositoryInterface {
 
-  private dbClient: DynamoDBDocumentClient;
-  private tableName: string;
+  private dbGateway: DatabaseGatewayInterface;
 
   constructor(dbGateway: DatabaseGatewayInterface) {
-    this.dbClient = dbGateway.dbClient;
-    this.tableName = dbGateway.tableName;
+    this.dbGateway = dbGateway;
+  }
+
+  private mapCustomerData(persistenceData: CustomerPersistenceInterface): CustomerDomainInterface {
+    return {
+      userId: persistenceData.userId, 
+      email: persistenceData.email, 
+      fullName: persistenceData.fullName,
+      cpf: persistenceData.cpf, 
+      phoneNumber: persistenceData.phoneNumber
+    };
+  }
+
+  private async queryCustomersByUserId(userId: string): Promise<CustomerPersistenceInterface[] | undefined> {
+    const { dbClient, queryCommand } = this.dbGateway;
+    const command = queryCommand({
+      KeyConditionExpression: 'PK = :pk',
+      ExpressionAttributeValues: { ':pk': `USER#${userId}#CUSTOMERS` }
+    });
+  
+    const { Items: dbResponse } = await dbClient.send(command);
+    const response = dbResponse as CustomerPersistenceInterface[] | undefined;
+    return response;
+  } 
+
+  private async getCustomerByCpf(userId: string, cpf: string): Promise<CustomerPersistenceInterface | undefined> {
+    const { dbClient, getCommand } = this.dbGateway;
+    const command = getCommand({
+      Key: {
+        PK: `USER#${userId}#CUSTOMERS`,
+        SK: `CUSTOMER#${cpf}`
+      }
+    });
+
+    const { Item: dbResponse } = await dbClient.send(command);
+    const response = dbResponse as CustomerPersistenceInterface | undefined;
+    return response;
+  }
+
+  private async putCustomer(userId: string, customerData: CustomerInterface): Promise<void> {
+    const { dbClient, putCommand } = this.dbGateway;
+    const command = putCommand({
+      PK: `USER#${userId}#CUSTOMERS`,
+      SK: `CUSTOMER#${customerData.cpf}`,
+      userId: userId,
+      ...customerData
+    });
+    await dbClient.send(command);
   }
 
   async getCustomers(userId: string): Promise<CustomerDomainInterface[] | undefined> {
     try {
-      const command = new QueryCommand({
-        TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk',
-        ExpressionAttributeValues: {
-          ':pk': `USER#${userId}#CUSTOMERS`
-        }
-      });
-  
-      const { Items: response } = await this.dbClient.send(command);
-  
-      const customersData: CustomerDomainInterface[] | undefined = response ? (response as CustomerPersistenceInterface[]).map(
-        (item) => ({ 
-          userId: item.PK.split('#')[1], 
-          email: item.email, 
-          fullName: item.fullName,
-          cpf: item.cpf, 
-          phoneNumber: item.phoneNumber
-        })
-      ) : undefined;
-  
+      const response = await this.queryCustomersByUserId(userId);  
+      const customersData: CustomerDomainInterface[] | undefined = response ? response.map((item) => this.mapCustomerData(item)) : undefined;
+
       return customersData;
     } catch (e) {
       throw new DatabaseError(String(e));
@@ -44,23 +71,8 @@ export class CustomerRepository implements CustomerRepositoryInterface {
 
   async getCustomer(userId: string, cpf: string): Promise<CustomerDomainInterface | undefined> {
     try {
-      const command = new GetCommand({
-        TableName: this.tableName,
-        Key: {
-          PK: `USER#${userId}#CUSTOMERS`,
-          SK: `CUSTOMER#${cpf}`
-        }
-      });
-  
-      const { Item: response } = await this.dbClient.send(command);
-  
-      const customerData: CustomerDomainInterface | undefined = response ? { 
-        userId: (response as CustomerPersistenceInterface).PK.split('#')[1], 
-        email: (response as CustomerPersistenceInterface).email, 
-        fullName: (response as CustomerPersistenceInterface).fullName,
-        cpf: (response as CustomerPersistenceInterface).cpf, 
-        phoneNumber: (response as CustomerPersistenceInterface).phoneNumber 
-      } : undefined;
+      const response = await this.getCustomerByCpf(userId, cpf);
+      const customerData: CustomerDomainInterface | undefined = response ? this.mapCustomerData(response) : undefined;
   
       return customerData;
     } catch (e) {
@@ -70,15 +82,7 @@ export class CustomerRepository implements CustomerRepositoryInterface {
 
   async storeCustomer(userId: string, customerData: CustomerInterface): Promise<void> {
     try {
-      const command = new PutCommand({
-        TableName: this.tableName,
-        Item: {
-          PK: `USER#${userId}#CUSTOMERS`,
-          SK: `CUSTOMER#${customerData.cpf}`,
-          ...customerData
-        }
-      });
-      await this.dbClient.send(command);
+      await this.putCustomer(userId, customerData);
     } catch (e) {
       throw new DatabaseError(String(e));
     }

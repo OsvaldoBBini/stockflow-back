@@ -132,6 +132,7 @@ describe('CustomerRepository', () => {
         Item: {
           PK: `USER#${mockUserId}#CUSTOMERS`,
           SK: `CUSTOMER#${customerData.cpf}`,
+          userId: mockUserId,
           ...customerData
         }
       });
@@ -143,7 +144,7 @@ describe('CustomerRepository', () => {
       const customerData: CustomerInterface = {
         cpf: '12345678901',
         phoneNumber: '11987654321',
-        fullName: 'John Doe'
+        fullName: 'John Doe',
       };
 
       dbMock.on(PutCommand).resolves({
@@ -156,6 +157,7 @@ describe('CustomerRepository', () => {
       expect(putCommand.args[0].input.Item).toEqual({
         PK: `USER#${mockUserId}#CUSTOMERS`,
         SK: `CUSTOMER#${customerData.cpf}`,
+        userId: mockUserId,
         ...customerData
       });
     });

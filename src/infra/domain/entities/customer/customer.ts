@@ -12,6 +12,7 @@ export interface CustomerDomainInterface extends CustomerInterface {
 export interface CustomerPersistenceInterface {
   PK: string;
   SK: string;
+  userId: string;
   email?: string;
   fullName: string;
   cpf: string;
