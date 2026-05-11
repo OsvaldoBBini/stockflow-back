@@ -16,6 +16,10 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/FormsBuilderTable"
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminGetUser
+          Resource: !GetAtt FormsBuilderUserPool.Arn
   environment:
       COGNITO_CLIENT_ID: !Ref FormsBuilderUserPoolClient
       COGNITO_POOL_ID: !Ref FormsBuilderUserPool
