@@ -1,6 +1,6 @@
 import { AdminGetUserCommand, CognitoIdentityProviderClient, ConfirmForgotPasswordCommand, ConfirmSignUpCommand, ForgotPasswordCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { AuthGatewayInterface } from '../../domain/entities/adapters/auth/authGateway';
-import { AccessPayloadInterface, ChangePasswordInterface, ConfirmAccountInterface, SignInInterface, SignUpInterface } from '../../domain/entities/adapters/auth/auth';
+import { AccessPayloadInterface, ChangePasswordInterface, ConfirmAccountInterface, SignInInterface, SignUpInterface, UserAttributesDomainInterface, UserAttributesPersistenceInterface } from '../../domain/entities/adapters/auth/auth';
 import { Logger } from '@aws-lambda-powertools/logger';
 
 const logger = new Logger({ serviceName: 'authGateway' });
@@ -122,8 +122,7 @@ export class CognitoGateway implements AuthGatewayInterface {
     await this.cognitoClient.send(command);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  async getUserInfos(userId: string): Promise< {} | undefined > {
+  async getUserInfos(userId: string): Promise< UserAttributesDomainInterface | undefined > {
 
     const command = new AdminGetUserCommand({
       Username: userId,
@@ -132,14 +131,27 @@ export class CognitoGateway implements AuthGatewayInterface {
     
     const { UserAttributes } = await this.cognitoClient.send(command);
     
-    const attributes = UserAttributes && UserAttributes
+    if (!UserAttributes) {
+      logger.error({ message: 'Failed to retrieve user attributes: No attributes returned', userId });
+      throw new Error('Failed to retrieve user attributes');
+    }
+
+    const attributes = UserAttributes
       .reduce((acc, post) => {
         const { Name, Value } = post;
         if (!Name || !Value) return acc;
         return {...acc, [Name]: Value};
       }, {});
+    
+    const persistenceAttributes = attributes as UserAttributesPersistenceInterface;
 
-    return attributes;
+    const userAttributes: UserAttributesDomainInterface = {
+      email: persistenceAttributes.email || '',
+      fullName: persistenceAttributes.given_name || '',
+      userId: persistenceAttributes.sub || ''
+    };
+    
+    return userAttributes;
   }
 
 }

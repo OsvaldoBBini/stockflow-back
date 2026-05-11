@@ -24,3 +24,16 @@ export interface ConfirmAccountInterface {
   email: string;
   confirmationCode: string;
 }
+
+export interface UserAttributesPersistenceInterface {
+  email: string;
+  email_verified: string;
+  given_name: string;
+  sub: string;
+}
+
+export interface UserAttributesDomainInterface {
+  email: string;
+  fullName: string;
+  userId: string;
+}
