@@ -29,8 +29,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       statusCode: 200,
       body: JSON.stringify({
         data: {
-          accessToken: authResult.accessToken,
-          refreshToken: authResult.refreshToken
+          accessToken: authResult.accessToken
         }
       })
     };

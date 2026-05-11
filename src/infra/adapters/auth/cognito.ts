@@ -9,10 +9,12 @@ export class CognitoGateway implements AuthGatewayInterface {
   
   private cognitoClient: CognitoIdentityProviderClient;
   private poolId: string | undefined;
+  private clientId: string | undefined;
 
   constructor() {
     this.cognitoClient = new CognitoIdentityProviderClient();
-    this.poolId = process.env.COGNITO_CLIENT_ID;
+    this.clientId = process.env.COGNITO_CLIENT_ID;
+    this.poolId = process.env.COGNITO_POOL_ID;
   }
 
   async signUp(signUpData: SignUpInterface): Promise<{ userId: string | undefined }> {
@@ -20,7 +22,7 @@ export class CognitoGateway implements AuthGatewayInterface {
     
     logger.debug({ message: 'Sending SignUp command to Cognito', email });
     const command = new SignUpCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       Username: email,
       Password: password,
       UserAttributes: [
@@ -39,7 +41,7 @@ export class CognitoGateway implements AuthGatewayInterface {
   async signIn(signInData: SignInInterface): Promise<AccessPayloadInterface | undefined> {
     const { email, password } = signInData;
     const command = new InitiateAuthCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       AuthFlow: 'USER_PASSWORD_AUTH',
       AuthParameters: {
         USERNAME: email,
@@ -63,7 +65,7 @@ export class CognitoGateway implements AuthGatewayInterface {
   async refreshToken(refreshToken: string): Promise<AccessPayloadInterface | undefined> {
     logger.debug({ message: 'Sending InitiateAuth command to Cognito', refreshToken });
     const command = new InitiateAuthCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
         REFRESH_TOKEN: refreshToken
@@ -87,7 +89,7 @@ export class CognitoGateway implements AuthGatewayInterface {
 
     logger.debug({ message: 'Sending ConfirmForgotPassword command to Cognito', email });
     const command = new ConfirmForgotPasswordCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       Username: email,
       ConfirmationCode: confirmationCode,
       Password: newPassword
@@ -100,7 +102,7 @@ export class CognitoGateway implements AuthGatewayInterface {
   async changePasswordConfirmationCode(email: string): Promise<void> {
     logger.debug({ message: 'Sending ForgotPassword command to Cognito', email });
     const command = new ForgotPasswordCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       Username: email,
     });
     
@@ -112,7 +114,7 @@ export class CognitoGateway implements AuthGatewayInterface {
 
     logger.debug({ message: 'Sending ConfirmSignUp command to Cognito', email });
     const command = new ConfirmSignUpCommand({
-      ClientId: this.poolId,
+      ClientId: this.clientId,
       Username: email,
       ConfirmationCode: confirmationCode
     });
