@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { 
   SignInInterface, 
   AccessPayloadInterface, 
@@ -9,9 +10,10 @@ import {
 
 export interface AuthGatewayInterface {
   signUp(signUpData: SignUpInterface): Promise<{ userId: string | undefined }>;
-  signIn(signInData: SignInInterface): Promise<AccessPayloadInterface>;
-  refreshToken(refreshToken: string): Promise<AccessPayloadInterface>;
+  signIn(signInData: SignInInterface): Promise<AccessPayloadInterface | undefined>;
+  refreshToken(refreshToken: string): Promise<AccessPayloadInterface | undefined>;
   changePassword(changePasswordData: ChangePasswordInterface): Promise<void>;
   changePasswordConfirmationCode(email: string): Promise<void>;
   confirmAccount(confirmAccountData: ConfirmAccountInterface): Promise<void>;
+  getUserInfos(userId: string): Promise< {} | undefined >;
 }

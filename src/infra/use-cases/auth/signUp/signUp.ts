@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { authGateway } from '../../../adapters/auth';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { z } from 'zod';
 import { Logger } from '@aws-lambda-powertools/logger';
@@ -31,35 +31,18 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   try {
     logger.info('Sign up process started');
-    
-    const cognitoClient = new CognitoIdentityProviderClient();
-
     const { 
       email, 
       password, 
-      fullName } = signUpSchema.parse(JSON.parse(event.body || ''));
+      fullName 
+    } = signUpSchema.parse(JSON.parse(event.body || ''));
 
     logger.debug({ message: 'Input validation successful', email, fullName });
-
-    const command = new SignUpCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
-      Username: email,
-      Password: password,
-      UserAttributes: [
-        {
-          Name: 'given_name',
-          Value: fullName
-        }]
-    });
-
-    logger.debug({ message: 'Sending SignUp command to Cognito', email });
-    const { UserSub } = await cognitoClient.send(command);
-
-    logger.info({ message: 'User registered successfully', userId: UserSub, email });
+    const { userId } = await authGateway.signUp({ email, password, fullName });
     
     return {
       statusCode: 201,
-      body: JSON.stringify({ data: { user: { id: UserSub } } }),
+      body: JSON.stringify({ data: { user: { id: userId } } }),
     };
 
   } catch (e) {    

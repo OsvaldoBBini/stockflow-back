@@ -1,8 +1,11 @@
-import { CognitoIdentityProviderClient, ConfirmForgotPasswordCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminGetUserCommand, CognitoIdentityProviderClient, ConfirmForgotPasswordCommand, ConfirmSignUpCommand, ForgotPasswordCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { AuthGatewayInterface } from '../../domain/entities/adapters/auth/authGateway';
 import { AccessPayloadInterface, ChangePasswordInterface, ConfirmAccountInterface, SignInInterface, SignUpInterface } from '../../domain/entities/adapters/auth/auth';
+import { Logger } from '@aws-lambda-powertools/logger';
 
-class CognitoGateway implements AuthGatewayInterface {
+const logger = new Logger({ serviceName: 'authGateway' });
+
+export class CognitoGateway implements AuthGatewayInterface {
   
   private cognitoClient: CognitoIdentityProviderClient;
   private poolId: string | undefined;
@@ -11,17 +14,11 @@ class CognitoGateway implements AuthGatewayInterface {
     this.cognitoClient = new CognitoIdentityProviderClient();
     this.poolId = process.env.COGNITO_CLIENT_ID;
   }
-  changePasswordConfirmationCode(email: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  confirmAccount(confirmAccountData: ConfirmAccountInterface): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
 
   async signUp(signUpData: SignUpInterface): Promise<{ userId: string | undefined }> {
-
     const { email, password, fullName } = signUpData;
-
+    
+    logger.debug({ message: 'Sending SignUp command to Cognito', email });
     const command = new SignUpCommand({
       ClientId: this.poolId,
       Username: email,
@@ -32,14 +29,15 @@ class CognitoGateway implements AuthGatewayInterface {
           Value: fullName
         }]
     });
-    
+
     const { UserSub } = await this.cognitoClient.send(command);
+    
+    logger.info({ message: 'User registered successfully', userId: UserSub, email });
     return { userId: UserSub };
   }
 
-  async signIn(signInData: SignInInterface): Promise<AccessPayloadInterface> {
+  async signIn(signInData: SignInInterface): Promise<AccessPayloadInterface | undefined> {
     const { email, password } = signInData;
-
     const command = new InitiateAuthCommand({
       ClientId: this.poolId,
       AuthFlow: 'USER_PASSWORD_AUTH',
@@ -52,7 +50,8 @@ class CognitoGateway implements AuthGatewayInterface {
     const { AuthenticationResult } = await this.cognitoClient.send(command);
     
     if (!AuthenticationResult) {
-      throw new Error('Invalid Credentials.');
+      logger.error({ message: 'Authentication failed: No authentication result returned', email });
+      return undefined;
     }
     
     return {
@@ -61,7 +60,8 @@ class CognitoGateway implements AuthGatewayInterface {
     };
   }
 
-  async refreshToken(refreshToken: string): Promise<AccessPayloadInterface> {
+  async refreshToken(refreshToken: string): Promise<AccessPayloadInterface | undefined> {
+    logger.debug({ message: 'Sending InitiateAuth command to Cognito', refreshToken });
     const command = new InitiateAuthCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       AuthFlow: 'REFRESH_TOKEN_AUTH',
@@ -71,9 +71,9 @@ class CognitoGateway implements AuthGatewayInterface {
     });
     
     const { AuthenticationResult } = await this.cognitoClient.send(command);
-    
     if (!AuthenticationResult) {
-      throw new Error('Invalid refresh token.');
+      logger.error({ message: 'Refresh token is invalid or has expired', refreshToken });
+      return undefined;
     }
 
     return {
@@ -84,16 +84,60 @@ class CognitoGateway implements AuthGatewayInterface {
 
   async changePassword(changePasswordData: ChangePasswordInterface): Promise<void> {
     const { email, confirmationCode, newPassword } = changePasswordData;
+
+    logger.debug({ message: 'Sending ConfirmForgotPassword command to Cognito', email });
     const command = new ConfirmForgotPasswordCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
       ConfirmationCode: confirmationCode,
       Password: newPassword
     });
+
     await this.cognitoClient.send(command);
   }
 
+    
+  async changePasswordConfirmationCode(email: string): Promise<void> {
+    logger.debug({ message: 'Sending ForgotPassword command to Cognito', email });
+    const command = new ForgotPasswordCommand({
+      ClientId: this.poolId,
+      Username: email,
+    });
+    
+    await this.cognitoClient.send(command);
+  }
+
+  async confirmAccount(confirmAccountData: ConfirmAccountInterface): Promise<void> {
+    const { email, confirmationCode } = confirmAccountData;
+
+    logger.debug({ message: 'Sending ConfirmSignUp command to Cognito', email });
+    const command = new ConfirmSignUpCommand({
+      ClientId: this.poolId,
+      Username: email,
+      ConfirmationCode: confirmationCode
+    });
+    
+    await this.cognitoClient.send(command);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  async getUserInfos(userId: string): Promise< {} | undefined > {
+
+    const command = new AdminGetUserCommand({
+      Username: userId,
+      UserPoolId: process.env.COGNITO_POOL_ID
+    });
+    
+    const { UserAttributes } = await this.cognitoClient.send(command);
+    
+    const attributes = UserAttributes && UserAttributes
+      .reduce((acc, post) => {
+        const { Name, Value } = post;
+        if (!Name || !Value) return acc;
+        return {...acc, [Name]: Value};
+      }, {});
+
+    return attributes;
+  }
+
 }
-
-
-export const cognitoGateway = new CognitoGateway();

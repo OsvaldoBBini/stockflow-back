@@ -1,8 +1,8 @@
-import { ConfirmForgotPasswordCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 import z from 'zod';
 import { ErrorManager } from '../../../../errors/errorManager';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { authGateway } from '../../../adapters/auth';
 
 const changePasswordSchema = z.object({
   email: z.email({message: 'Invalid email format.'}),
@@ -32,24 +32,12 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   try {
     logger.info('Change password process started');
-    
-    const cognitoClient = new CognitoIdentityProviderClient();
     const { email, confirmationCode, newPassword } = changePasswordSchema.parse(JSON.parse(event.body || ''));
 
     logger.debug({ message: 'Input validation successful', email });
+    await authGateway.changePassword({ email, confirmationCode, newPassword });
 
-    const command = new ConfirmForgotPasswordCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
-      Username: email,
-      ConfirmationCode: confirmationCode,
-      Password: newPassword
-    });
-
-    logger.debug({ message: 'Sending ConfirmForgotPassword command to Cognito', email });
-    await cognitoClient.send(command);
-    
     logger.info({ message: 'Password changed successfully', email });
-    
     return {
       statusCode: 201,
       body: JSON.stringify({ data: { user: { email } } })
