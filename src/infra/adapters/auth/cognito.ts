@@ -63,7 +63,7 @@ export class CognitoGateway implements AuthGatewayInterface {
   async refreshToken(refreshToken: string): Promise<AccessPayloadInterface | undefined> {
     logger.debug({ message: 'Sending InitiateAuth command to Cognito', refreshToken });
     const command = new InitiateAuthCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
+      ClientId: this.poolId,
       AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
         REFRESH_TOKEN: refreshToken
@@ -87,7 +87,7 @@ export class CognitoGateway implements AuthGatewayInterface {
 
     logger.debug({ message: 'Sending ConfirmForgotPassword command to Cognito', email });
     const command = new ConfirmForgotPasswordCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
+      ClientId: this.poolId,
       Username: email,
       ConfirmationCode: confirmationCode,
       Password: newPassword
@@ -125,7 +125,7 @@ export class CognitoGateway implements AuthGatewayInterface {
 
     const command = new AdminGetUserCommand({
       Username: userId,
-      UserPoolId: process.env.COGNITO_POOL_ID
+      UserPoolId: this.poolId,
     });
     
     const { UserAttributes } = await this.cognitoClient.send(command);
