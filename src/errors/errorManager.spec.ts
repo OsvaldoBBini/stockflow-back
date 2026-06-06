@@ -39,7 +39,7 @@ describe('ErrorManager', () => {
 
   describe('Zod validation errors', () => {
 
-    it('should return 400 for ZodError', () => {
+    it('should return 422 for ZodError', () => {
       const schema = z.object({
         email: z.string().email(),
         name: z.string()
@@ -50,7 +50,7 @@ describe('ErrorManager', () => {
 
       if (!result.success) {
         const response = errorManager.errorHandler(result.error);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(422);
         expect(JSON.parse(response.body).data).toHaveProperty('message');
       }
     });

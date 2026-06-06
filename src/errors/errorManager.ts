@@ -46,7 +46,7 @@ export class ErrorManager {
     }
 
     if(e instanceof ZodError) {
-      return this.throwError(400, z.treeifyError(e));
+      return this.throwError(422, z.treeifyError(e));
     }
 
     if (e instanceof SyntaxError) {
