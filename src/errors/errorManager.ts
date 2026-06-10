@@ -42,7 +42,7 @@ export class ErrorManager {
     this.dispatchLoggerMessage(e);
 
     if (e instanceof DatabaseError) {
-      return this.throwError(500, 'Database error occurred');
+      return this.throwError(400, 'Database error occurred');
     }
 
     if(e instanceof ZodError) {
@@ -62,7 +62,7 @@ export class ErrorManager {
     }
 
     if (e instanceof UserNotConfirmedException) {
-      return this.throwError(400, 'User not confirmed');
+      return this.throwError(403, 'User not confirmed');
     }
 
     if (e instanceof CodeMismatchException) {
