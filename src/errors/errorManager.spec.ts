@@ -19,12 +19,12 @@ describe('ErrorManager', () => {
 
   describe('DatabaseError handling', () => {
 
-    it('should return 500 status for DatabaseError', () => {
+    it('should return 400 status for DatabaseError', () => {
       const error = new DatabaseError('Connection failed');
 
       const response = errorManager.errorHandler(error);
 
-      expect(response.statusCode).toBe(500);
+      expect(response.statusCode).toBe(400);
       expect(JSON.parse(response.body).data.message).toBe('Database error occurred');
     });
 
@@ -82,7 +82,7 @@ describe('ErrorManager', () => {
       expect(JSON.parse(response.body).data.message).toBe('E-mail already in used');
     });
 
-    it('should return 400 for UserNotConfirmedException', () => {
+    it('should return 403 for UserNotConfirmedException', () => {
       const error = new UserNotConfirmedException({ 
         message: 'User not confirmed',
         $metadata: {} as any
@@ -90,7 +90,7 @@ describe('ErrorManager', () => {
 
       const response = errorManager.errorHandler(error);
 
-      expect(response.statusCode).toBe(400);
+      expect(response.statusCode).toBe(403);
       expect(JSON.parse(response.body).data.message).toBe('User not confirmed');
     });
 
