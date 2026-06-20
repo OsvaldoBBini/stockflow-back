@@ -1,6 +1,7 @@
 import { CustomMessageTriggerEvent } from 'aws-lambda';
 import { singUpMessage } from './signupMessage';
 import { forgotPasswordMessage } from './forgotPasswordMessage';
+import { resendConfirmationCodeMessage } from './resendConfirmationCodeMessage';
 
 export async function handler(event: CustomMessageTriggerEvent) {
 
@@ -16,6 +17,12 @@ export async function handler(event: CustomMessageTriggerEvent) {
 
   if (event.triggerSource === 'CustomMessage_ForgotPassword') {
     const { subject, emailMessage } = forgotPasswordMessage(code);
+    event.response.emailSubject = subject;
+    event.response.emailMessage = emailMessage;
+  }
+
+  if (event.triggerSource === 'CustomMessage_ResendCode') {
+    const { subject, emailMessage } = resendConfirmationCodeMessage(name, code);
     event.response.emailSubject = subject;
     event.response.emailMessage = emailMessage;
   }
