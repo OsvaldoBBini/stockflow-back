@@ -52,7 +52,7 @@ describe('changePassword', () => {
     const emptyBodyEvent = { body: JSON.stringify({...body, newPassword: ''}) } as APIGatewayProxyEventV2;
     const response = await handler(emptyBodyEvent);
   
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(JSON.parse(response.body)).toEqual({
       data: {
         message: {

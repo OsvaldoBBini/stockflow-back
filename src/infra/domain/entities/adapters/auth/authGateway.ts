@@ -15,5 +15,6 @@ export interface AuthGatewayInterface {
   changePassword(changePasswordData: ChangePasswordInterface): Promise<void>;
   changePasswordConfirmationCode(email: string): Promise<void>;
   confirmAccount(confirmAccountData: ConfirmAccountInterface): Promise<void>;
+  resendConfirmationCode(email: string): Promise<void>;
   getUserInfos(userId: string): Promise< {} | undefined >;
 }

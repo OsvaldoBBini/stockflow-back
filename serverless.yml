@@ -68,6 +68,13 @@ functions:
           path: /auth/account-confirmation
           method: POST
   
+  resend-confirmation-code-service:
+    handler: src/infra/use-cases/auth/accountConfirmation/resendConfirmationCode.handler
+    events:
+      - httpApi:
+          path: /auth/resend-confirmation-code
+          method: POST
+
   change-password-confirmation-code-service:
     handler: src/infra/use-cases/auth/changePassword/changePasswordConfirmationCode.handler
     events:

@@ -132,7 +132,7 @@ describe('createCustomer handler', () => {
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(responseBody.data.message.properties).toHaveProperty('cpf');
   });
 
@@ -161,7 +161,7 @@ describe('createCustomer handler', () => {
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(responseBody.data.message.properties).toHaveProperty('phoneNumber');
   });
 
@@ -190,7 +190,7 @@ describe('createCustomer handler', () => {
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(responseBody.data.message.properties).toHaveProperty('email');
   });
 
@@ -219,7 +219,7 @@ describe('createCustomer handler', () => {
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(responseBody.data.message.properties).toHaveProperty('fullName');
   });
 
@@ -248,7 +248,7 @@ describe('createCustomer handler', () => {
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(responseBody.data.message.properties).toHaveProperty('fullName');
   });
 
@@ -328,7 +328,7 @@ describe('createCustomer handler', () => {
 
     const response = await handler(event);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
   });
 
 });

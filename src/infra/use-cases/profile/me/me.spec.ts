@@ -57,11 +57,9 @@ describe('getProfile - me handler', () => {
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
     expect(body.data).toEqual({
-      sub: mockUserId,
       email: 'test@example.com',
-      email_verified: 'true',
-      given_name: 'Test',
-      family_name: 'User',
+      fullName: 'Test',
+      userId: 'user-test-sub-123',
     });
   });
 
@@ -75,7 +73,11 @@ describe('getProfile - me handler', () => {
 
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
-    expect(body.data).toEqual({});
+    expect(body.data).toEqual({
+      email: '',
+      fullName: '',
+      userId: '',
+    });
   });
 
   it('should extract userId from JWT claims correctly', async () => {

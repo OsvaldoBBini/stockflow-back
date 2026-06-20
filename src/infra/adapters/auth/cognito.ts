@@ -1,4 +1,4 @@
-import { AdminGetUserCommand, CognitoIdentityProviderClient, ConfirmForgotPasswordCommand, ConfirmSignUpCommand, ForgotPasswordCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminGetUserCommand, CognitoIdentityProviderClient, ConfirmForgotPasswordCommand, ConfirmSignUpCommand, ForgotPasswordCommand, InitiateAuthCommand, ResendConfirmationCodeCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { AuthGatewayInterface } from '../../domain/entities/adapters/auth/authGateway';
 import { AccessPayloadInterface, ChangePasswordInterface, ConfirmAccountInterface, SignInInterface, SignUpInterface, UserAttributesDomainInterface, UserAttributesPersistenceInterface } from '../../domain/entities/adapters/auth/auth';
 import { Logger } from '@aws-lambda-powertools/logger';
@@ -117,6 +117,16 @@ export class CognitoGateway implements AuthGatewayInterface {
       ClientId: this.clientId,
       Username: email,
       ConfirmationCode: confirmationCode
+    });
+    
+    await this.cognitoClient.send(command);
+  }
+
+  async resendConfirmationCode(email: string): Promise<void> {
+    logger.debug({ message: 'Sending ResendConfirmationCode command to Cognito', email });
+    const command = new ResendConfirmationCodeCommand({
+      ClientId: this.clientId,
+      Username: email,
     });
     
     await this.cognitoClient.send(command);

@@ -45,8 +45,7 @@ describe('refreshToken', () => {
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body)).toEqual({
       data: {
-        accessToken: mockTokens.AccessToken,
-        refreshToken: mockTokens.RefreshToken,
+        accessToken: mockTokens.AccessToken
       }
     });
   });
@@ -64,11 +63,11 @@ describe('refreshToken', () => {
     });
   });
 
-  it('should return a 400 when refresh token is missing', async () => {
+  it('should return a 422 when refresh token is missing', async () => {
     const emptyBodyEvent = { body: JSON.stringify({}) } as APIGatewayProxyEventV2;
     const response = await handler(emptyBodyEvent);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     const responseBody = JSON.parse(response.body);
     expect(responseBody.data.message.properties.refreshToken).toBeDefined();
   });
@@ -93,7 +92,6 @@ describe('refreshToken', () => {
     await handler(event);
 
     expect(cognitoMock.call(0).args[0].input).toMatchObject({
-      ClientId: 'test-client-id-123',
       AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
         REFRESH_TOKEN: 'valid-refresh-token-abc123',

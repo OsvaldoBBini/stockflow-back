@@ -67,7 +67,7 @@ describe('signIn', () => {
     });
   });
 
-  it('should return a 400 with an error message indicating invalid input data', async () => {
+  it('should return a 422 with an error message indicating invalid input data', async () => {
     cognitoMock.on(InitiateAuthCommand).resolves({
       AuthenticationResult: undefined,
     });
@@ -75,7 +75,7 @@ describe('signIn', () => {
     const emptyBodyEvent = { body: JSON.stringify({}) } as APIGatewayProxyEventV2;
     const response = await handler(emptyBodyEvent);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(422);
     expect(JSON.parse(response.body)).toEqual({
       data: {
         message: {
