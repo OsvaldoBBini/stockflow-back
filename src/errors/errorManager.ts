@@ -6,7 +6,8 @@ import {
   UsernameExistsException, 
   UserNotFoundException, 
   UserNotConfirmedException, 
-  NotAuthorizedException
+  NotAuthorizedException,
+  ExpiredCodeException
 } from '@aws-sdk/client-cognito-identity-provider';
 
 
@@ -67,6 +68,10 @@ export class ErrorManager {
 
     if (e instanceof CodeMismatchException) {
       return this.throwError(404, 'The confirmation code is not valid');
+    }
+
+    if (e instanceof ExpiredCodeException) {
+      return this.throwError(411, 'The confirmation code is expired');
     }
 
     if (e instanceof InvalidPasswordException) {
