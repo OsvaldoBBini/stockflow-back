@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { handler } from './me';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import {
@@ -39,6 +38,7 @@ describe('getProfile - me handler', () => {
 
     process.env = {
       COGNITO_POOL_ID: mockPoolId,
+      COGNITO_CLIENT_ID: 'test-client-id',
     };
   });
 
@@ -51,6 +51,7 @@ describe('getProfile - me handler', () => {
       UserAttributes: mockUserAttributes,
     });
 
+    const { handler } = await import('./me');
     const event = createEvent();
     const response = await handler(event);
 
@@ -68,6 +69,7 @@ describe('getProfile - me handler', () => {
       UserAttributes: [],
     });
 
+    const { handler } = await import('./me');
     const event = createEvent();
     const response = await handler(event);
 
@@ -81,15 +83,11 @@ describe('getProfile - me handler', () => {
   });
 
   it('should extract userId from JWT claims correctly', async () => {
-    const adminGetUserSpy = vi.spyOn(
-      CognitoIdentityProviderClient.prototype,
-      'send'
-    );
-
     cognitoMock.on(AdminGetUserCommand).resolves({
       UserAttributes: mockUserAttributes,
     });
 
+    const { handler } = await import('./me');
     const customUserId = 'custom-user-id-456';
     const event = createEvent(customUserId);
     await handler(event);
