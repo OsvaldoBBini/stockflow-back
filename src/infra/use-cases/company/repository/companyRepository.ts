@@ -12,7 +12,7 @@ export class CompanyRepository implements CompanyRepositoryInterface {
     this.dbGateway = dbGateway;
   }
 
-  private async putCompany(companyData: CompanyInterface): Promise<void> {
+  private async putCompany(companyData: CompanyInterface): Promise<string> {
     const { dbClient, putCommand } = this.dbGateway;
     const companyId = crypto.randomUUID();
     const command = putCommand({
@@ -22,11 +22,13 @@ export class CompanyRepository implements CompanyRepositoryInterface {
       companyId: companyId
     });
     await dbClient.send(command);
+    return companyId;
   }
 
-  async createCompany(companyData: CompanyInterface): Promise<void> {
+  async createCompany(companyData: CompanyInterface): Promise<string> {
     try {
-      await this.putCompany(companyData);
+      const companyId = await this.putCompany(companyData);
+      return companyId;
     } catch (e) {
       throw new DatabaseError(String(e));
     }
