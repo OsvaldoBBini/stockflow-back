@@ -133,6 +133,15 @@ functions:
           authorizer: 
             name: CognitoAuthorizer
 
+  create-company-service:
+    handler: src/infra/use-cases/company/createCompany/createCompany.handler
+    events:
+      - httpApi:
+          path: /companies
+          method: POST
+          authorizer: 
+            name: CognitoAuthorizer
+
 resources:
   Resources:
 
