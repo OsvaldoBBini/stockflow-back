@@ -1,4 +1,5 @@
 export interface CustomerInterface {
+  companyId: string;
   email?: string;
   fullName: string;
   cpf: string;
@@ -6,13 +7,13 @@ export interface CustomerInterface {
 }
 
 export interface CustomerDomainInterface extends CustomerInterface {
-  userId: string;
+  companyId: string;
 }
 
 export interface CustomerPersistenceInterface {
   PK: string;
   SK: string;
-  userId: string;
+  companyId: string;
   email?: string;
   fullName: string;
   cpf: string;

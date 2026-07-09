@@ -22,17 +22,17 @@ describe('getCustomers handler', () => {
 
   it('should return all customers for a user successfully', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCustomers = [
       {
-        userId: mockUserId,
+        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: '12345678901',
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       },
       {
-        userId: mockUserId,
+        companyId: mockCompanyId,
         email: 'jane.doe@example.com',
         cpf: '98765432109',
         phoneNumber: '11987654322',
@@ -41,15 +41,9 @@ describe('getCustomers handler', () => {
     ];
 
     const event = {
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     // Mock repository method
@@ -63,24 +57,18 @@ describe('getCustomers handler', () => {
     expect(responseBody.data.items).toHaveLength(2);
     
     // Verify repository was called correctly
-    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockUserId);
+    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockCompanyId);
     expect(mockCustomerRepository.getCustomers).toHaveBeenCalledTimes(1);
   });
 
   it('should return empty array when no customers exist', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
 
     const event = {
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     // Mock getCustomers to return undefined
@@ -93,26 +81,20 @@ describe('getCustomers handler', () => {
     expect(responseBody.data.items).toEqual([]);
     
     // Verify repository was called correctly
-    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockUserId);
+    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockCompanyId);
   });
 
-  it('should return 401 when user ID is missing', async () => {
+  it('should return 401 when company ID is missing', async () => {
 
     const event = {
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {}
-          }
-        }
-      }
+      pathParameters: {}
     } as unknown as APIGatewayProxyEvent;
 
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(401);
-    expect(responseBody.data.message).toBe('Unauthorized: Missing user ID');
+    expect(responseBody.data.message).toBe('Unauthorized: Missing company ID in path parameters.');
     
     // Verify repository was NOT called
     expect(mockCustomerRepository.getCustomers).not.toHaveBeenCalled();
@@ -128,7 +110,7 @@ describe('getCustomers handler', () => {
     const responseBody = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(401);
-    expect(responseBody.data.message).toBe('Unauthorized: Missing user ID');
+    expect(responseBody.data.message).toBe('Unauthorized: Missing company ID in path parameters.');
     
     // Verify repository was NOT called
     expect(mockCustomerRepository.getCustomers).not.toHaveBeenCalled();
@@ -136,18 +118,12 @@ describe('getCustomers handler', () => {
 
   it('should handle repository errors gracefully', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
 
     const event = {
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     // Mock getCustomers to throw an error
@@ -158,15 +134,15 @@ describe('getCustomers handler', () => {
     expect(response.statusCode).toBeGreaterThanOrEqual(400);
     
     // Verify repository was called
-    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockUserId);
+    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockCompanyId);
   });
 
   it('should return single customer in array format', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCustomers = [
       {
-        userId: mockUserId,
+        companyId: mockCompanyId,
         email: 'single.customer@example.com',
         cpf: '55555555555',
         phoneNumber: '11987654321',
@@ -175,15 +151,9 @@ describe('getCustomers handler', () => {
     ];
 
     const event = {
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     // Mock repository method
@@ -197,6 +167,6 @@ describe('getCustomers handler', () => {
     expect(responseBody.data.items[0].cpf).toBe('55555555555');
     
     // Verify repository was called correctly
-    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockUserId);
+    expect(mockCustomerRepository.getCustomers).toHaveBeenCalledWith(mockCompanyId);
   });
 });

@@ -23,11 +23,11 @@ describe('CustomerRepository', () => {
 
     it('should return customer when it exists', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const mockCpf = '12345678901';
 
       const customerData: CustomerDomainInterface = {
-        userId: mockUserId,
+        companyId: companyId,
         email: 'john@example.com',
         cpf: mockCpf,
         phoneNumber: '11987654321',
@@ -36,17 +36,17 @@ describe('CustomerRepository', () => {
 
       dbMock.on(GetCommand).resolves({
         Item: {
-          PK: `USER#${mockUserId}#CUSTOMERS`,
+          PK: `COMPANY#${companyId}#CUSTOMERS`,
           SK: `CUSTOMER#${mockCpf}`,
           ...customerData
         },
         $metadata: { httpStatusCode: 200 }
       });
 
-      const result = await repository.getCustomer(mockUserId, mockCpf);
+      const result = await repository.getCustomer(companyId, mockCpf);
 
       expect(result).toBeDefined();
-      expect(result?.userId).toBe(mockUserId);
+      expect(result?.companyId).toBe(companyId);
       expect(result?.cpf).toBe(mockCpf);
       expect(result?.email).toBe('john@example.com');
       expect(result?.fullName).toBe('John Doe');
@@ -54,33 +54,33 @@ describe('CustomerRepository', () => {
 
     it('should return undefined when customer does not exist', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const mockCpf = '12345678901';
 
       dbMock.on(GetCommand).resolves({
         $metadata: { httpStatusCode: 200 }
       });
 
-      const result = await repository.getCustomer(mockUserId, mockCpf);
+      const result = await repository.getCustomer(companyId, mockCpf);
 
       expect(result).toBeUndefined();
     });
 
     it('should call GetCommand with correct parameters', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const mockCpf = '12345678901';
 
       dbMock.on(GetCommand).resolves({
         $metadata: { httpStatusCode: 200 }
       });
 
-      await repository.getCustomer(mockUserId, mockCpf);
+      await repository.getCustomer(companyId, mockCpf);
 
       expect(dbMock.commandCalls(GetCommand)[0].args[0].input).toEqual({
         TableName: tableName,
         Key: {
-          PK: `USER#${mockUserId}#CUSTOMERS`,
+          PK: `COMPANY#${companyId}#CUSTOMERS`,
           SK: `CUSTOMER#${mockCpf}`
         }
       });
@@ -91,8 +91,9 @@ describe('CustomerRepository', () => {
 
     it('should store customer successfully', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const customerData: CustomerInterface = {
+        companyId: companyId,
         email: 'john@example.com',
         cpf: '12345678901',
         phoneNumber: '11987654321',
@@ -104,7 +105,7 @@ describe('CustomerRepository', () => {
       });
 
       await expect(
-        repository.storeCustomer(mockUserId, customerData)
+        repository.storeCustomer(customerData)
       ).resolves.not.toThrow();
 
       expect(dbMock.commandCalls(PutCommand).length).toBe(1);
@@ -112,8 +113,9 @@ describe('CustomerRepository', () => {
 
     it('should call PutCommand with correct parameters', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const customerData: CustomerInterface = {
+        companyId: companyId,
         email: 'john@example.com',
         cpf: '12345678901',
         phoneNumber: '11987654321',
@@ -124,15 +126,14 @@ describe('CustomerRepository', () => {
         $metadata: { httpStatusCode: 200 }
       });
 
-      await repository.storeCustomer(mockUserId, customerData);
+      await repository.storeCustomer(customerData);
 
       const putCommand = dbMock.commandCalls(PutCommand)[0];
       expect(putCommand.args[0].input).toEqual({
         TableName: tableName,
         Item: {
-          PK: `USER#${mockUserId}#CUSTOMERS`,
+          PK: `COMPANY#${customerData.companyId}#CUSTOMERS`,
           SK: `CUSTOMER#${customerData.cpf}`,
-          userId: mockUserId,
           ...customerData
         }
       });
@@ -140,8 +141,9 @@ describe('CustomerRepository', () => {
 
     it('should store customer with optional email field', async () => {
 
-      const mockUserId = 'user123';
+      const companyId = '599b80c6-6428-4863-a255-f85f986c24e2';
       const customerData: CustomerInterface = {
+        companyId: companyId,
         cpf: '12345678901',
         phoneNumber: '11987654321',
         fullName: 'John Doe',
@@ -151,13 +153,12 @@ describe('CustomerRepository', () => {
         $metadata: { httpStatusCode: 200 }
       });
 
-      await repository.storeCustomer(mockUserId, customerData);
+      await repository.storeCustomer(customerData);
 
       const putCommand = dbMock.commandCalls(PutCommand)[0];
       expect(putCommand.args[0].input.Item).toEqual({
-        PK: `USER#${mockUserId}#CUSTOMERS`,
+        PK: `COMPANY#${customerData.companyId}#CUSTOMERS`,
         SK: `CUSTOMER#${customerData.cpf}`,
-        userId: mockUserId,
         ...customerData
       });
     });

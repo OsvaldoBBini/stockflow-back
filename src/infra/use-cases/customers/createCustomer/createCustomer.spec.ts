@@ -24,24 +24,19 @@ describe('createCustomer handler', () => {
 
   it('should create a new customer successfully', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
+        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: mockCpf,
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
+      pathParameters: {
+        companyId: mockCompanyId
       }
     } as unknown as APIGatewayProxyEvent;
 
@@ -56,8 +51,9 @@ describe('createCustomer handler', () => {
     expect(responseBody.data.customer.cpf).toBe(mockCpf);
     
     // Verify repository was called correctly
-    expect(mockCustomerRepository.getCustomer).toHaveBeenCalledWith(mockUserId, mockCpf);
-    expect(mockCustomerRepository.storeCustomer).toHaveBeenCalledWith(mockUserId, {
+    expect(mockCustomerRepository.getCustomer).toHaveBeenCalledWith(mockCompanyId, mockCpf);
+    expect(mockCustomerRepository.storeCustomer).toHaveBeenCalledWith({
+      companyId: mockCompanyId,
       email: 'john.doe@example.com',
       cpf: mockCpf,
       phoneNumber: '11987654321',
@@ -67,30 +63,25 @@ describe('createCustomer handler', () => {
 
   it('should return 409 when customer with same CPF already exists', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
+        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: mockCpf,
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
+      pathParameters: {
+        companyId: mockCompanyId
       }
     } as unknown as APIGatewayProxyEvent;
 
     // Mock getCustomer to return existing customer
     mockCustomerRepository.getCustomer.mockResolvedValueOnce({
-      userId: mockUserId,
+      companyId: mockCompanyId,
       email: 'john.doe@example.com',
       cpf: mockCpf,
       phoneNumber: '11987654321',
@@ -109,23 +100,18 @@ describe('createCustomer handler', () => {
 
   it('should return error when CPF format is invalid', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
 
     const event = {
       body: JSON.stringify({
+        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: '123456789', // Only 9 digits instead of 11
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
+      pathParameters: {
+        companyId: mockCompanyId
       }
     } as unknown as APIGatewayProxyEvent;
 
@@ -254,24 +240,19 @@ describe('createCustomer handler', () => {
 
   it('should create customer with optional email field omitted', async () => {
 
-    const mockUserId = '12345-abcde';
+    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
+        companyId: mockCompanyId,
         cpf: mockCpf,
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     mockCustomerRepository.getCustomer.mockResolvedValueOnce(undefined);

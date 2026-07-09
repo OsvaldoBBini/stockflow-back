@@ -9,22 +9,24 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEvent) {
 
   try {
-    const userId = event.requestContext.authorizer?.jwt.claims.sub;
+    // const userId = event.requestContext.authorizer?.jwt.claims.sub;
+
+    const { companyId } = event.pathParameters || {};
     
-    if (!userId) {
+    if (!companyId) {
       return {
         statusCode: 401,
         body: JSON.stringify({ 
           data: { 
-            message: 'Unauthorized: Missing user ID' 
+            message: 'Unauthorized: Missing company ID in path parameters.' 
           } 
         }),
       };
     }
 
-    logger.debug({ message: 'Fetching customers for user', userId });
+    logger.debug({ message: 'Fetching customers for company', companyId });
 
-    const customers = await customerRepository.getCustomers(userId);
+    const customers = await customerRepository.getCustomers(companyId);
   
     return {
       statusCode: 200,
