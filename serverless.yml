@@ -119,7 +119,7 @@ functions:
     handler: src/infra/use-cases/customers/createCustomer/createCustomer.handler
     events:
       - httpApi:
-          path: /company/{companyId}/customers
+          path: /companies/{companyId}/customers
           method: POST
           authorizer: 
             name: CognitoAuthorizer
@@ -128,7 +128,7 @@ functions:
     handler: src/infra/use-cases/customers/getCustomers/getCustomers.handler
     events:
       - httpApi:
-          path: /company/{companyId}/customers
+          path: /companies/{companyId}/customers
           method: GET
           authorizer: 
             name: CognitoAuthorizer
