@@ -3,3 +3,12 @@ export interface CompanyInterface {
   companyName: string;
   role: 'owner' | 'admin' | 'user';
 }
+
+export interface CompanyDomainInterface extends CompanyInterface {
+  companyId: string;
+}
+
+export interface CompanyPersistenceInterface extends CompanyDomainInterface {
+  PK: string;
+  SK: string;
+}

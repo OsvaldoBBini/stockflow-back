@@ -9,8 +9,6 @@ const { errorHandler } = new ErrorManager(logger);
 export async function handler(event: APIGatewayProxyEvent) {
 
   try {
-    // const userId = event.requestContext.authorizer?.jwt.claims.sub;
-
     const { companyId } = event.pathParameters || {};
     
     if (!companyId) {

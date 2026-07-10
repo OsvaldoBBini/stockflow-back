@@ -8,7 +8,6 @@ const logger = new Logger({ serviceName: 'createCustomer' });
 const { errorHandler } = new ErrorManager(logger);
 
 const createCustomerSchema = z.object({
-  companyId: z.uuid({ message: 'Invalid company ID format.' }),
   email: z.email({message: 'Invalid email format.'}).optional(),
   cpf: z.string().regex(/^\d{11}$/, { message: 'CPF must be 11 digits long.' }),
   phoneNumber: z.string().regex(/^[1-9]{2}9\d{8}$/, { message: 'Phone number must be 11 digits long.' }),
@@ -17,11 +16,10 @@ const createCustomerSchema = z.object({
 
 export async function handler(event: APIGatewayProxyEvent) {
 
-  try {
-    // const userId = event.requestContext.authorizer?.jwt.claims.sub;
-    
+  try {   
+    const { companyId } = event.pathParameters || {};
+
     const { 
-      companyId,
       email, 
       cpf,
       phoneNumber,
@@ -29,7 +27,7 @@ export async function handler(event: APIGatewayProxyEvent) {
 
     logger.debug({ message: 'Input validation successful', email, fullName, cpf, phoneNumber });
 
-    const customerExists = await customerRepository.getCustomer(companyId, cpf);
+    const customerExists = await customerRepository.getCustomer(companyId!, cpf);
     if (customerExists) {
       return {
         statusCode: 409,
@@ -37,7 +35,7 @@ export async function handler(event: APIGatewayProxyEvent) {
       };
     }
 
-    await customerRepository.storeCustomer({companyId, email, cpf, phoneNumber, fullName });
+    await customerRepository.storeCustomer({companyId: companyId!, email, cpf, phoneNumber, fullName });
   
     return {
       statusCode: 201,

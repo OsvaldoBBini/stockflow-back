@@ -1,5 +1,5 @@
-import { CompanyInterface } from './company';
+import { CompanyDomainInterface, CompanyInterface } from './company';
 
 export interface CompanyRepositoryInterface {
-  createCompany(companyData: CompanyInterface): Promise<string>;
+  createCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface>;
 }
