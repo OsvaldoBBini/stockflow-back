@@ -16,6 +16,8 @@ const mockCustomerRepository = customerRepositoryModule.customerRepository as an
 
 describe('createCustomer handler', () => {
 
+  const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockCustomerRepository.getCustomer.mockReset();
@@ -24,12 +26,10 @@ describe('createCustomer handler', () => {
 
   it('should create a new customer successfully', async () => {
 
-    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
-        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: mockCpf,
         phoneNumber: '11987654321',
@@ -63,12 +63,10 @@ describe('createCustomer handler', () => {
 
   it('should return 409 when customer with same CPF already exists', async () => {
 
-    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
-        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: mockCpf,
         phoneNumber: '11987654321',
@@ -100,11 +98,8 @@ describe('createCustomer handler', () => {
 
   it('should return error when CPF format is invalid', async () => {
 
-    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
-
     const event = {
       body: JSON.stringify({
-        companyId: mockCompanyId,
         email: 'john.doe@example.com',
         cpf: '123456789', // Only 9 digits instead of 11
         phoneNumber: '11987654321',
@@ -240,12 +235,10 @@ describe('createCustomer handler', () => {
 
   it('should create customer with optional email field omitted', async () => {
 
-    const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
-        companyId: mockCompanyId,
         cpf: mockCpf,
         phoneNumber: '11987654321',
         fullName: 'John Doe'
@@ -267,19 +260,11 @@ describe('createCustomer handler', () => {
 
   it('should return error when body is empty', async () => {
 
-    const mockUserId = '12345-abcde';
-
     const event = {
       body: '',
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
-      }
+      pathParameters: {
+        companyId: mockCompanyId
+      },
     } as unknown as APIGatewayProxyEvent;
 
     const response = await handler(event);
@@ -289,21 +274,12 @@ describe('createCustomer handler', () => {
 
   it('should return error when required fields are missing', async () => {
 
-    const mockUserId = '12345-abcde';
-
     const event = {
       body: JSON.stringify({
         email: 'john.doe@example.com'
-        // Missing cpf, phoneNumber, fullName
       }),
-      requestContext: {
-        authorizer: {
-          jwt: {
-            claims: {
-              sub: mockUserId
-            }
-          }
-        }
+      pathParameters: {
+        companyId: mockCompanyId
       }
     } as unknown as APIGatewayProxyEvent;
 
