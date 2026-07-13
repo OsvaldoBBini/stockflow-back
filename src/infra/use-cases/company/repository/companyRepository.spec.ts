@@ -35,7 +35,7 @@ describe('CompanyRepository', () => {
         repository.createCompany(companyData)
       ).resolves.not.toThrow();
     
-      expect(dbMock.commandCalls(PutCommand).length).toBe(1);
+      expect(dbMock.commandCalls(PutCommand).length).toBe(2);
     });
 
     it('should handle database errors when storing', async () => {
@@ -76,7 +76,18 @@ describe('CompanyRepository', () => {
 
     it('should return companies for a user', async () => {
       const mockItems = [
-        { companyId: 'c1', userId: mockUserId, companyName: 'Test Company', role: 'owner' }
+        { 
+          PK: `USER#${mockUserId}`, 
+          SK: 'COMPANY#c1', 
+          companyId: 'c1',
+          userId: mockUserId, 
+          companyName: 'Test Company', 
+          role: 'owner' },
+        { 
+          PK: `USER#${mockUserId}`, 
+          SK: 'DEFAULT#COMPANY', 
+          companyId: 'c1'  
+        }
       ];
 
       dbMock.on(QueryCommand).resolves({ Items: mockItems });
