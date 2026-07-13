@@ -4,30 +4,28 @@ import z from 'zod';
 import { APIGatewayProxyEvent } from 'aws-lambda/trigger/api-gateway-proxy';
 import { companyRepository } from '../repository/companyRepository';
 
-const logger = new Logger({ serviceName: 'createCompany' });
+const logger = new Logger({ serviceName: 'setCompanyAsDefault' });
 const { errorHandler } = new ErrorManager(logger);
 
-const createCompanySchema = z.object({
-  companyName: z.string().min(2, {message: 'Company name must be at least 2 characters long.'}).max(20, {message: 'Company name must be at most 20 characters long.'}),
+const setCompanyAsDefaultSchema = z.object({
+  companyId: z.uuidv4()
 });
 
 export async function handler(event: APIGatewayProxyEvent) {
 
   try {
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
-    
-    const { companyName } = createCompanySchema.parse(JSON.parse(event.body || ''));
-    logger.debug({ message: 'Input validation successful', companyName });
 
-    const company = await companyRepository.createCompany(
-      { userId, companyName, role: 'owner' }
-    );
+    const { companyId } = setCompanyAsDefaultSchema.parse(JSON.parse(event.body || ''));
+    logger.debug({ message: 'Input validation successful', companyId });
+
+    const company = await companyRepository.setDefaultCompany(companyId, userId);
   
     return {
       statusCode: 201,
       body: JSON.stringify(
         { 
-          data: { company }
+          data: { companyId: company.companyId }
         }
       ),
     };

@@ -6,6 +6,7 @@ export interface CompanyInterface {
 
 export interface CompanyDomainInterface extends CompanyInterface {
   companyId: string;
+  isDefault?: boolean
 }
 
 export interface CompanyPersistenceInterface extends CompanyDomainInterface {

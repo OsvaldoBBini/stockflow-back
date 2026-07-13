@@ -47,10 +47,33 @@ export class CompanyRepository implements CompanyRepositoryInterface {
     return {...companyData, companyId};
   }
 
+  private async setCompanyAsDefault(companyId: string, userId: string): Promise<{companyId: string}> {
+    const { dbClient, putCommand } = this.dbGateway;
+    const command = putCommand({
+      PK: `USER#${userId}`,
+      SK: 'DEFAULT#COMPANY',
+      companyId: companyId
+    });
+    await dbClient.send(command);
+    return { companyId };
+  }
+
   async getCompanies(userId: string): Promise<CompanyDomainInterface[] | undefined> {
     try {
       const response = await this.getCompaniesByUserId(userId);
-      const companies = response?.map(this.mapCompanyData);
+      const defaultCompanyReturn = response?.filter((item) => item.SK === 'DEFAULT#COMPANY');
+      const defaultCompany = defaultCompanyReturn ? defaultCompanyReturn[0].companyId : null; 
+
+      const companies = response?.filter(
+        (item) => item.SK.startsWith('COMPANY'))?.map(
+        (item) => {
+          const domainItem =  this.mapCompanyData(item);
+          if (domainItem.companyId === defaultCompany) {
+            return {...domainItem, isDefault: true};
+          }
+          return domainItem;
+        });
+
       return companies;
     } catch (e) {
       throw new DatabaseError(String(e));
@@ -60,7 +83,17 @@ export class CompanyRepository implements CompanyRepositoryInterface {
   async createCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface> {
     try {
       const company = await this.putCompany(companyData);
+      await this.setCompanyAsDefault(company.companyId, company.userId);
       return company;
+    } catch (e) {
+      throw new DatabaseError(String(e));
+    }
+  }
+
+  async setDefaultCompany(companyId: string, userId: string): Promise<{companyId: string}> {
+    try {
+      const response = await this.setCompanyAsDefault(companyId, userId);
+      return response;
     } catch (e) {
       throw new DatabaseError(String(e));
     }
