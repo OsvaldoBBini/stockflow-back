@@ -35,6 +35,26 @@ describe('CompanyRepository', () => {
         repository.createCompany(companyData)
       ).resolves.not.toThrow();
     
+      expect(dbMock.commandCalls(PutCommand).length).toBe(1);
+    });
+
+    it('should store company successfully and define as default', async () => {
+  
+      const companyData: CompanyInterface = {
+        userId: mockUserId,
+        companyName: 'Test Company',
+        role: 'owner',
+        isDefault: true
+      };
+    
+      dbMock.on(PutCommand).resolves({
+        $metadata: { httpStatusCode: 200 }
+      });
+    
+      await expect(
+        repository.createCompany(companyData)
+      ).resolves.not.toThrow();
+    
       expect(dbMock.commandCalls(PutCommand).length).toBe(2);
     });
 

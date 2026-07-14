@@ -54,7 +54,8 @@ describe('createCompany handler', () => {
     expect(mockCompanyRepository.createCompany).toHaveBeenCalledWith({
       userId: mockUserId,
       companyName: 'AcmeCorp',
-      role: 'owner'
+      role: 'owner',
+      isDefault: false
     });
   });
 

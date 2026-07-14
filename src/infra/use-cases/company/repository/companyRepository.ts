@@ -17,7 +17,8 @@ export class CompanyRepository implements CompanyRepositoryInterface {
       companyId: persistenceData.companyId,
       userId: persistenceData.userId,
       companyName: persistenceData.companyName,
-      role: persistenceData.role
+      role: persistenceData.role,
+      isDefault: persistenceData.isDefault
     };
   }
 
@@ -83,7 +84,7 @@ export class CompanyRepository implements CompanyRepositoryInterface {
   async createCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface> {
     try {
       const company = await this.putCompany(companyData);
-      await this.setCompanyAsDefault(company.companyId, company.userId);
+      if (company.isDefault) await this.setCompanyAsDefault(company.companyId, company.userId);
       return company;
     } catch (e) {
       throw new DatabaseError(String(e));
