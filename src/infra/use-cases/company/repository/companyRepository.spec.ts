@@ -102,12 +102,9 @@ describe('CompanyRepository', () => {
           companyId: 'c1',
           userId: mockUserId, 
           companyName: 'Test Company', 
-          role: 'owner' },
-        { 
-          PK: `USER#${mockUserId}`, 
-          SK: 'DEFAULT#COMPANY', 
-          companyId: 'c1'  
-        }
+          role: 'owner',
+          isDefault: true
+        },
       ];
 
       dbMock.on(QueryCommand).resolves({ Items: mockItems });
@@ -127,12 +124,9 @@ describe('CompanyRepository', () => {
           companyId: 'c1',
           userId: mockUserId, 
           companyName: 'Test Company', 
-          role: 'owner' },
-        { 
-          PK: `USER#${mockUserId}`, 
-          SK: 'DEFAULT#COMPANY', 
-          companyId: 'c1'  
-        }
+          role: 'owner',
+          isDefault: false
+        },
       ];
 
       dbMock.on(QueryCommand).resolves({ Items: mockItems });

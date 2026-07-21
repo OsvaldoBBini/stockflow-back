@@ -142,15 +142,6 @@ functions:
           authorizer: 
             name: CognitoAuthorizer
   
-  set-default-company-service:
-    handler: src/infra/use-cases/company/setCompanyAsDefault/setCompanyAsDefault.handler
-    events:
-      - httpApi:
-          path: /companies/default
-          method: POST
-          authorizer: 
-            name: CognitoAuthorizer
-  
   get-companies-service:
     handler: src/infra/use-cases/company/getCompanies/getCompanies.handler
     events:
