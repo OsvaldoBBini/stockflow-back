@@ -63,12 +63,12 @@ export class CompanyRepository implements CompanyRepositoryInterface {
     try {
       const response = await this.getCompaniesByUserId(userId);
       const defaultCompanyReturn = response?.filter((item) => item.SK === 'DEFAULT#COMPANY');
-      const defaultCompany = defaultCompanyReturn ? defaultCompanyReturn[0].companyId : null; 
+      const defaultCompany = defaultCompanyReturn?.[0]?.companyId ?? null; 
 
       const companies = response?.filter(
         (item) => item.SK.startsWith('COMPANY'))?.map(
         (item) => {
-          const domainItem =  this.mapCompanyData(item);
+          const domainItem = this.mapCompanyData(item);
           if (domainItem.companyId === defaultCompany) {
             return {...domainItem, isDefault: true};
           }

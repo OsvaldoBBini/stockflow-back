@@ -118,6 +118,31 @@ describe('CompanyRepository', () => {
       expect(result?.[0].companyName).toBe('Test Company');
       expect(dbMock.commandCalls(QueryCommand).length).toBe(1);
     });
+    
+    it('should return companies for a user', async () => {
+      const mockItems = [
+        { 
+          PK: `USER#${mockUserId}`, 
+          SK: 'COMPANY#c1', 
+          companyId: 'c1',
+          userId: mockUserId, 
+          companyName: 'Test Company', 
+          role: 'owner' },
+        { 
+          PK: `USER#${mockUserId}`, 
+          SK: 'DEFAULT#COMPANY', 
+          companyId: 'c1'  
+        }
+      ];
+
+      dbMock.on(QueryCommand).resolves({ Items: mockItems });
+
+      const result = await repository.getCompanies(mockUserId);
+
+      expect(result).toHaveLength(1);
+      expect(result?.[0].companyName).toBe('Test Company');
+      expect(dbMock.commandCalls(QueryCommand).length).toBe(1);
+    });
 
     it('should handle database errors when querying', async () => {
       dbMock.on(QueryCommand).rejects(new Error('Query error'));
