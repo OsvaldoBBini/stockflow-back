@@ -1,4 +1,5 @@
 export interface CompanyInterface {
+  companyId?: string 
   userId: string;
   companyName: string;
   role: 'owner' | 'admin' | 'user';

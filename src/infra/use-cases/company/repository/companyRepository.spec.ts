@@ -46,6 +46,18 @@ describe('CompanyRepository', () => {
         role: 'owner',
         isDefault: true
       };
+
+      dbMock.on(QueryCommand).resolves({
+        Items: [{
+          PK: `USER#${mockUserId}`,
+          SK: 'COMPANY#existing',
+          companyId: 'existing',
+          userId: mockUserId,
+          companyName: 'Existing Company',
+          role: 'owner',
+          isDefault: true
+        }]
+      });
     
       dbMock.on(PutCommand).resolves({
         $metadata: { httpStatusCode: 200 }

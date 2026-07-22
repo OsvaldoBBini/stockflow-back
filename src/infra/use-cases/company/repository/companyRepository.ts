@@ -22,7 +22,7 @@ export class CompanyRepository implements CompanyRepositoryInterface {
     };
   }
 
-  private async getCompaniesByUserId(userId: string): Promise<CompanyPersistenceInterface[] | undefined> {
+  private async getCompaniesByUserId(userId: string): Promise<CompanyPersistenceInterface[] | null> {
     const { dbClient, queryCommand } = this.dbGateway;
     const command = queryCommand({
       KeyConditionExpression: 'PK = :pk',
@@ -30,9 +30,9 @@ export class CompanyRepository implements CompanyRepositoryInterface {
         ':pk': `USER#${userId}`,
       },
     });
-    const { Items: dbResponse } = await dbClient.send(command);
-    const response = dbResponse as CompanyPersistenceInterface[] | undefined;
-    return response;
+    const response = await dbClient.send(command);
+    const dbResponse = response?.Items as CompanyPersistenceInterface[] | undefined;
+    return dbResponse ?? null;
   }
 
   private async putCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface> {
@@ -48,9 +48,10 @@ export class CompanyRepository implements CompanyRepositoryInterface {
     return {...companyData, companyId};
   }
 
-  async getCompanies(userId: string): Promise<CompanyDomainInterface[] | undefined> {
+  async getCompanies(userId: string): Promise<CompanyDomainInterface[] | null> {
     try {
-      const response = await this.getCompaniesByUserId(userId) || [];
+      const response = await this.getCompaniesByUserId(userId);
+      if (!response) return null;
       const companies = response.map(item => this.mapCompanyData(item));
       return companies;
     } catch (e) {
@@ -60,6 +61,13 @@ export class CompanyRepository implements CompanyRepositoryInterface {
 
   async createCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface> {
     try {
+      if (companyData.isDefault === true) {
+        const companies = await this.getCompanies(companyData.userId);
+        if (companies) {
+          const isDefaultCompany = companies.filter((company) => company.isDefault === true);
+          await this.putCompany({...isDefaultCompany[0], isDefault: false});
+        }
+      }
       const company = await this.putCompany(companyData);
       return company;
     } catch (e) {
