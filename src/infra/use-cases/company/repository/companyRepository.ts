@@ -62,10 +62,10 @@ export class CompanyRepository implements CompanyRepositoryInterface {
   async createCompany(companyData: CompanyInterface): Promise<CompanyDomainInterface> {
     try {
       if (companyData.isDefault === true) {
-        const companies = await this.getCompanies(companyData.userId);
+        const companies = await this.getCompaniesByUserId(companyData.userId);
         if (companies) {
-          const isDefaultCompany = companies.filter((company) => company.isDefault === true);
-          await this.putCompany({...isDefaultCompany[0], isDefault: false});
+          const isDefaultCompany = companies.find((company) => company.isDefault === true);
+          if (isDefaultCompany) await this.putCompany({...isDefaultCompany, isDefault: false});
         }
       }
       const company = await this.putCompany(companyData);
