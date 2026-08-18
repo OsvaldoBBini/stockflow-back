@@ -3,6 +3,6 @@ import { CustomerInterface } from './customer';
 
 export interface CustomerRepositoryInterface {
   getCustomers(companyId: string): Promise<CustomerDomainInterface[] | undefined>;
-  getCustomer(companyId: string, cpf: string): Promise<CustomerDomainInterface | undefined>;
-  storeCustomer(customerData: CustomerInterface): Promise<void>;
+  updateCustomer(customerData: CustomerDomainInterface): Promise<void>;
+  storeCustomer(customerData: CustomerInterface): Promise<string>;
 }

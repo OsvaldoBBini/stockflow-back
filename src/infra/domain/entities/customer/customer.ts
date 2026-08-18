@@ -7,7 +7,7 @@ export interface CustomerInterface {
 }
 
 export interface CustomerDomainInterface extends CustomerInterface {
-  companyId: string;
+  customerId: string;
 }
 
 export interface CustomerPersistenceInterface {
@@ -18,4 +18,5 @@ export interface CustomerPersistenceInterface {
   fullName: string;
   cpf: string;
   phoneNumber: string;
+  customerId: string;
 }

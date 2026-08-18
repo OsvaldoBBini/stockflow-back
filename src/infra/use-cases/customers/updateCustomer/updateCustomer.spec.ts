@@ -1,59 +1,62 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { APIGatewayProxyEvent } from 'aws-lambda/trigger/api-gateway-proxy';
-import { handler } from './createCustomer';
+import { handler } from './updateCustomer';
 import * as customerRepositoryModule from '../repository/customerRepository';
 
 // Mock the entire repository module
 vi.mock('../repository/customerRepository', () => ({
   customerRepository: {
     getCustomer: vi.fn(),
-    storeCustomer: vi.fn()
+    storeCustomer: vi.fn(),
+    updateCustomer: vi.fn()
   }
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockCustomerRepository = customerRepositoryModule.customerRepository as any;
 
-describe('createCustomer handler', () => {
+describe('updateCustomer handler', () => {
 
   const mockCompanyId = '599b80c6-6428-4863-a255-f85f986c24e2';
+  const mockCustomerId = 'customer-12345';
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockCustomerRepository.getCustomer.mockReset();
     mockCustomerRepository.storeCustomer.mockReset();
+    mockCustomerRepository.updateCustomer.mockReset();
   });
 
-  it('should create a new customer successfully', async () => {
-
-    const mockCpf = '12345678901';
+  it('should update a customer successfully', async () => {
 
     const event = {
       body: JSON.stringify({
         email: 'john.doe@example.com',
-        cpf: mockCpf,
+        cpf: '12345678901',
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
       pathParameters: {
-        companyId: mockCompanyId
+        companyId: mockCompanyId,
+        customerId: mockCustomerId
       }
     } as unknown as APIGatewayProxyEvent;
 
     // Mock repository methods
     mockCustomerRepository.getCustomer.mockResolvedValueOnce(undefined);
-    mockCustomerRepository.storeCustomer.mockResolvedValueOnce(undefined);
+    mockCustomerRepository.updateCustomer.mockResolvedValueOnce(mockCustomerId);
 
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(201);
-    expect(responseBody.data.customer.cpf).toBe(mockCpf);
-    
-    // Verify repository was called correctly
-    expect(mockCustomerRepository.storeCustomer).toHaveBeenCalledWith({
+    expect(response.statusCode).toBe(200);
+    expect(responseBody.data.customer.cpf).toBe('12345678901');
+
+    expect(mockCustomerRepository.updateCustomer).toHaveBeenCalledWith({
+      companyId: mockCompanyId,
+      customerId: mockCustomerId,
       email: 'john.doe@example.com',
-      cpf: mockCpf,
+      cpf: '12345678901',
       phoneNumber: '11987654321',
       fullName: 'John Doe'
     });
@@ -64,12 +67,13 @@ describe('createCustomer handler', () => {
     const event = {
       body: JSON.stringify({
         email: 'john.doe@example.com',
-        cpf: '123456789', // Only 9 digits instead of 11
+        cpf: '123456789',
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
       pathParameters: {
-        companyId: mockCompanyId
+        companyId: mockCompanyId,
+        customerId: mockCustomerId
       }
     } as unknown as APIGatewayProxyEvent;
 
@@ -88,7 +92,7 @@ describe('createCustomer handler', () => {
       body: JSON.stringify({
         email: 'john.doe@example.com',
         cpf: '12345678901',
-        phoneNumber: '11987654', // Invalid format
+        phoneNumber: '11987654',
         fullName: 'John Doe'
       }),
       requestContext: {
@@ -111,7 +115,6 @@ describe('createCustomer handler', () => {
 
   it('should return error when email format is invalid', async () => {
 
-    const mockUserId = '12345-abcde';
 
     const event = {
       body: JSON.stringify({
@@ -124,7 +127,7 @@ describe('createCustomer handler', () => {
         authorizer: {
           jwt: {
             claims: {
-              sub: mockUserId
+              sub: mockCustomerId
             }
           }
         }
@@ -140,8 +143,6 @@ describe('createCustomer handler', () => {
 
   it('should return error when fullName is too short', async () => {
 
-    const mockUserId = '12345-abcde';
-
     const event = {
       body: JSON.stringify({
         email: 'john.doe@example.com',
@@ -153,7 +154,7 @@ describe('createCustomer handler', () => {
         authorizer: {
           jwt: {
             claims: {
-              sub: mockUserId
+              sub: mockCustomerId
             }
           }
         }
@@ -169,8 +170,6 @@ describe('createCustomer handler', () => {
 
   it('should return error when fullName is too long', async () => {
 
-    const mockUserId = '12345-abcde';
-
     const event = {
       body: JSON.stringify({
         email: 'john.doe@example.com',
@@ -182,7 +181,7 @@ describe('createCustomer handler', () => {
         authorizer: {
           jwt: {
             claims: {
-              sub: mockUserId
+              sub: mockCustomerId
             }
           }
         }
@@ -196,28 +195,28 @@ describe('createCustomer handler', () => {
     expect(responseBody.data.message.properties).toHaveProperty('fullName');
   });
 
-  it('should create customer with optional email field omitted', async () => {
+  it('should update customer with optional email field omitted', async () => {
 
     const mockCpf = '12345678901';
 
     const event = {
       body: JSON.stringify({
-        cpf: mockCpf,
+        cpf: '12345678901',
         phoneNumber: '11987654321',
         fullName: 'John Doe'
       }),
       pathParameters: {
-        companyId: mockCompanyId
+        companyId: mockCompanyId,
+        customerId: mockCustomerId
       },
     } as unknown as APIGatewayProxyEvent;
-
-    mockCustomerRepository.getCustomer.mockResolvedValueOnce(undefined);
-    mockCustomerRepository.storeCustomer.mockResolvedValueOnce(undefined);
+    
+    mockCustomerRepository.updateCustomer.mockResolvedValueOnce(undefined);
 
     const response = await handler(event);
     const responseBody = JSON.parse(response.body);
 
-    expect(response.statusCode).toBe(201);
+    expect(response.statusCode).toBe(200);
     expect(responseBody.data.customer.cpf).toBe(mockCpf);
   });
 
@@ -226,7 +225,8 @@ describe('createCustomer handler', () => {
     const event = {
       body: '',
       pathParameters: {
-        companyId: mockCompanyId
+        companyId: mockCompanyId,
+        customerId: mockCustomerId
       },
     } as unknown as APIGatewayProxyEvent;
 
@@ -242,7 +242,8 @@ describe('createCustomer handler', () => {
         email: 'john.doe@example.com'
       }),
       pathParameters: {
-        companyId: mockCompanyId
+        companyId: mockCompanyId,
+        customerId: mockCustomerId
       }
     } as unknown as APIGatewayProxyEvent;
 

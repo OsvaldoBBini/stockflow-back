@@ -7,7 +7,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda/trigger/api-gateway-proxy';
 const logger = new Logger({ serviceName: 'createCustomer' });
 const { errorHandler } = new ErrorManager(logger);
 
-const createCustomerSchema = z.object({
+const updateCustomerSchema = z.object({
   email: z.email({message: 'Invalid email format.'}).optional(),
   cpf: z.string().regex(/^\d{11}$/, { message: 'CPF must be 11 digits long.' }),
   phoneNumber: z.string().regex(/^[1-9]{2}9\d{8}$/, { message: 'Phone number must be 11 digits long.' }),
@@ -17,20 +17,20 @@ const createCustomerSchema = z.object({
 export async function handler(event: APIGatewayProxyEvent) {
 
   try {   
-    const { companyId } = event.pathParameters || {};
+    const { companyId, customerId } = event.pathParameters || {};
 
     const { 
       email, 
       cpf,
       phoneNumber,
-      fullName } = createCustomerSchema.parse(JSON.parse(event.body || ''));
+      fullName } = updateCustomerSchema.parse(JSON.parse(event.body || ''));
 
     logger.debug({ message: 'Input validation successful', email, fullName, cpf, phoneNumber });
 
-    const customerId = await customerRepository.storeCustomer({companyId: companyId!, email, cpf, phoneNumber, fullName });
+    await customerRepository.updateCustomer({companyId: companyId!, customerId: customerId!, email, cpf, phoneNumber, fullName });
   
     return {
-      statusCode: 201,
+      statusCode: 200,
       body: JSON.stringify(
         { 
           data: { customer: { email, cpf, phoneNumber, fullName, customerId } }

@@ -17,7 +17,8 @@ export class CustomerRepository implements CustomerRepositoryInterface {
       email: persistenceData.email, 
       fullName: persistenceData.fullName,
       cpf: persistenceData.cpf, 
-      phoneNumber: persistenceData.phoneNumber
+      phoneNumber: persistenceData.phoneNumber,
+      customerId: persistenceData.customerId
     };
   }
 
@@ -33,30 +34,30 @@ export class CustomerRepository implements CustomerRepositoryInterface {
     return response;
   } 
 
-  private async getCustomerByCpf(companyId: string, cpf: string): Promise<CustomerPersistenceInterface | undefined> {
-    const { dbClient, getCommand } = this.dbGateway;
-    const command = getCommand({
-      Key: {
-        PK: `COMPANY#${companyId}#CUSTOMERS`,
-        SK: `CUSTOMER#${cpf}`
-      }
-    });
-
-    const { Item: dbResponse } = await dbClient.send(command);
-    const response = dbResponse as CustomerPersistenceInterface | undefined;
-    return response;
-  }
-
-  private async putCustomer(customerData: CustomerInterface): Promise<void> {
+  private async putCustomer(customerData: CustomerInterface): Promise<string> {
     const { dbClient, putCommand } = this.dbGateway;
+
+    const customerId = crypto.randomUUID(); 
+
     const command = putCommand({
       PK: `COMPANY#${customerData.companyId}#CUSTOMERS`,
-      SK: `CUSTOMER#${customerData.cpf}`,
-      ...customerData
+      SK: `CUSTOMER#${customerId}`,
+      ...customerData,
+      customerId: customerId
     });
     await dbClient.send(command);
+    return customerId;
   }
 
+  private async changeCustomer(customerData: CustomerDomainInterface): Promise<void> {
+    const { dbClient, updateCommand } = this.dbGateway;
+    const command = updateCommand({
+      PK: `COMPANY#${customerData.companyId}#CUSTOMERS`,
+      SK: `CUSTOMER#${customerData.customerId}`
+    }, customerData);
+    await dbClient.send(command);
+  }
+  
   async getCustomers(companyId: string): Promise<CustomerDomainInterface[] | undefined> {
     try {
       const response = await this.queryCustomersByCompanyId(companyId);  
@@ -67,21 +68,19 @@ export class CustomerRepository implements CustomerRepositoryInterface {
       throw new DatabaseError(String(e));
     }
   }
-
-  async getCustomer(companyId: string, cpf: string): Promise<CustomerDomainInterface | undefined> {
-    try {
-      const response = await this.getCustomerByCpf(companyId, cpf);
-      const customerData: CustomerDomainInterface | undefined = response ? this.mapCustomerData(response) : undefined;
   
-      return customerData;
+  async storeCustomer(customerData: CustomerInterface): Promise<string> {
+    try {
+      const customerId = await this.putCustomer(customerData);
+      return customerId;
     } catch (e) {
       throw new DatabaseError(String(e));
     }
   }
 
-  async storeCustomer(customerData: CustomerInterface): Promise<void> {
+  async updateCustomer(customerData: CustomerDomainInterface): Promise<void> {
     try {
-      await this.putCustomer(customerData);
+      await this.changeCustomer(customerData);
     } catch (e) {
       throw new DatabaseError(String(e));
     }

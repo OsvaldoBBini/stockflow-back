@@ -124,6 +124,15 @@ functions:
           authorizer: 
             name: CognitoAuthorizer
   
+  update-customer-service:
+    handler: src/infra/use-cases/customers/updateCustomer/updateCustomer.handler
+    events:
+      - httpApi:
+          path: /companies/{companyId}/customers/{customerId}
+          method: PUT
+          authorizer: 
+            name: CognitoAuthorizer
+  
   get-customers-service:
     handler: src/infra/use-cases/customers/getCustomers/getCustomers.handler
     events:
