@@ -32,6 +32,13 @@ provider:
         issuerUrl: !GetAtt FormsBuilderUserPool.ProviderURL
         audience:
           - !Ref FormsBuilderUserPoolClient
+    cors:
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
 
 package:
   individually: true
