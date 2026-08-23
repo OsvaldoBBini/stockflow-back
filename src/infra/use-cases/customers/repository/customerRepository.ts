@@ -14,7 +14,7 @@ export class CustomerRepository implements CustomerRepositoryInterface {
   private mapCustomerData(persistenceData: CustomerPersistenceInterface): CustomerDomainInterface {
     return {
       companyId: persistenceData.companyId,
-      email: persistenceData.email, 
+      email: persistenceData.email === null ? '' : persistenceData.email, 
       fullName: persistenceData.fullName,
       cpf: persistenceData.cpf, 
       phoneNumber: persistenceData.phoneNumber,
@@ -52,18 +52,10 @@ export class CustomerRepository implements CustomerRepositoryInterface {
   private async changeCustomer(customerData: CustomerDomainInterface): Promise<void> {
     const { dbClient, updateCommand } = this.dbGateway;
 
-    let updateValues: { email?: string; fullName: string; cpf: string; phoneNumber: string } = {
-      fullName: customerData.fullName,
-      cpf: customerData.cpf,
-      phoneNumber: customerData.phoneNumber
-    };
-
-    if (customerData.email !== undefined) updateValues = { ...updateValues, email: customerData.email};
-
     const command = updateCommand({
       PK: `COMPANY#${customerData.companyId}#CUSTOMERS`,
       SK: `CUSTOMER#${customerData.customerId}`
-    }, updateValues);
+    }, customerData);
     await dbClient.send(command);
   }
   

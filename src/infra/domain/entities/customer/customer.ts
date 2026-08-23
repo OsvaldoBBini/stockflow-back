@@ -1,6 +1,6 @@
 export interface CustomerInterface {
   companyId: string;
-  email?: string;
+  email: string | null;
   fullName: string;
   cpf: string;
   phoneNumber: string;
@@ -14,7 +14,7 @@ export interface CustomerPersistenceInterface {
   PK: string;
   SK: string;
   companyId: string;
-  email?: string;
+  email: string | null;
   fullName: string;
   cpf: string;
   phoneNumber: string;

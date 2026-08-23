@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { APIGatewayProxyEvent } from 'aws-lambda/trigger/api-gateway-proxy';
 import { handler } from './createCustomer';
 import * as customerRepositoryModule from '../repository/customerRepository';
+import { email } from 'zod';
 
 // Mock the entire repository module
 vi.mock('../repository/customerRepository', () => ({
@@ -196,7 +197,8 @@ describe('createCustomer handler', () => {
       body: JSON.stringify({
         cpf: mockCpf,
         phoneNumber: '11987654321',
-        fullName: 'John Doe'
+        fullName: 'John Doe',
+        email: null
       }),
       pathParameters: {
         companyId: mockCompanyId
