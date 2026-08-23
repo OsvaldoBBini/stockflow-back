@@ -24,7 +24,7 @@ describe('createCompany handler', () => {
   it('should create a new company successfully', async () => {
 
     const event = {
-      body: JSON.stringify({ companyName: 'AcmeCorp' }),
+      body: JSON.stringify({ companyName: 'AcmeCorp', cnpj: '11111111000191' }),
       requestContext: {
         authorizer: {
           jwt: {
@@ -40,7 +40,8 @@ describe('createCompany handler', () => {
       companyId: 'company-1',
       userId: mockUserId,
       companyName: 'AcmeCorp',
-      role: 'owner'
+      role: 'owner',
+      cnpj: '11111111000191'
     };
 
     mockCompanyRepository.createCompany.mockResolvedValueOnce(mockCompany);
@@ -55,7 +56,8 @@ describe('createCompany handler', () => {
       userId: mockUserId,
       companyName: 'AcmeCorp',
       role: 'owner',
-      isDefault: false
+      isDefault: false,
+      cnpj: '11111111000191'
     });
   });
 

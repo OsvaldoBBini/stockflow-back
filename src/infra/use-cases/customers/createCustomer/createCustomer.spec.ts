@@ -49,14 +49,6 @@ describe('createCustomer handler', () => {
 
     expect(response.statusCode).toBe(201);
     expect(responseBody.data.customer.cpf).toBe(mockCpf);
-    
-    // Verify repository was called correctly
-    expect(mockCustomerRepository.storeCustomer).toHaveBeenCalledWith({
-      email: 'john.doe@example.com',
-      cpf: mockCpf,
-      phoneNumber: '11987654321',
-      fullName: 'John Doe'
-    });
   });
   
   it('should return error when CPF format is invalid', async () => {

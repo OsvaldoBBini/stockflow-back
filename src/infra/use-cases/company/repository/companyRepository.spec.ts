@@ -22,9 +22,11 @@ describe('CompanyRepository', () => {
     it('should store company successfully', async () => {
   
       const companyData: CompanyInterface = {
+        cnpj: '11111111000191', 
         userId: mockUserId,
         companyName: 'Test Company',
-        role: 'owner'
+        role: 'owner',
+        isDefault: true
       };
     
       dbMock.on(PutCommand).resolves({
@@ -41,6 +43,7 @@ describe('CompanyRepository', () => {
     it('should store company successfully and define as default', async () => {
   
       const companyData: CompanyInterface = {
+        cnpj: '11111111000191', 
         userId: mockUserId,
         companyName: 'Test Company',
         role: 'owner',
@@ -54,6 +57,7 @@ describe('CompanyRepository', () => {
           companyId: 'existing',
           userId: mockUserId,
           companyName: 'Existing Company',
+          cnpj: '11111111000191',
           role: 'owner',
           isDefault: true
         }]
@@ -73,9 +77,11 @@ describe('CompanyRepository', () => {
     it('should handle database errors when storing', async () => {
     
       const companyData: CompanyInterface = {
+        cnpj: '11111111000191', 
         userId: mockUserId,
         companyName: 'Test Company',
-        role: 'owner'
+        role: 'owner',
+        isDefault: true
       };
 
       dbMock.on(PutCommand).rejects(new Error('Database error'));
@@ -87,9 +93,11 @@ describe('CompanyRepository', () => {
 
     it('should return created company with generated companyId', async () => {
       const companyData: CompanyInterface = {
+        cnpj: '11111111000191', 
         userId: mockUserId,
         companyName: 'Test Company',
-        role: 'owner'
+        role: 'owner',
+        isDefault: true
       };
 
       dbMock.on(PutCommand).resolves({ $metadata: { httpStatusCode: 200 } });

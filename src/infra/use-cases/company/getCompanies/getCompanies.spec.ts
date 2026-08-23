@@ -36,8 +36,8 @@ describe('getCompanies handler', () => {
     } as unknown as APIGatewayProxyEvent;
 
     const mockCompanies = [
-      { companyId: 'c1', userId: mockUserId, companyName: 'One', role: 'owner' },
-      { companyId: 'c2', userId: mockUserId, companyName: 'Two', role: 'member' }
+      { companyId: 'c1', userId: mockUserId, companyName: 'One', role: 'owner', cnpj: '11111111000191'},
+      { companyId: 'c2', userId: mockUserId, companyName: 'Two', role: 'member', cnpj: '11111111000191'}
     ];
 
     mockCompanyRepository.getCompanies.mockResolvedValueOnce(mockCompanies);

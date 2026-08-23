@@ -14,6 +14,7 @@ export class CompanyRepository implements CompanyRepositoryInterface {
 
   private mapCompanyData(persistenceData: CompanyPersistenceInterface): CompanyDomainInterface {
     return {
+      cnpj: persistenceData.cnpj, 
       companyId: persistenceData.companyId,
       userId: persistenceData.userId,
       companyName: persistenceData.companyName,

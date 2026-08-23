@@ -9,6 +9,7 @@ const { errorHandler } = new ErrorManager(logger);
 
 const createCompanySchema = z.object({
   companyName: z.string().min(2, {message: 'Company name must be at least 2 characters long.'}).max(20, {message: 'Company name must be at most 20 characters long.'}),
+  cnpj: z.string().regex(/^\d{14}$/, { message: 'CPF must be 11 digits long.' }),
   isDefault: z.boolean().default(false)
 });
 
@@ -17,11 +18,11 @@ export async function handler(event: APIGatewayProxyEvent) {
   try {
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
     
-    const { companyName, isDefault } = createCompanySchema.parse(JSON.parse(event.body || ''));
+    const { companyName, cnpj, isDefault } = createCompanySchema.parse(JSON.parse(event.body || ''));
     logger.debug({ message: 'Input validation successful', companyName });
 
     const company = await companyRepository.createCompany(
-      { userId, companyName, isDefault, role: 'owner' }
+      { userId, cnpj, companyName, isDefault, role: 'owner' }
     );
   
     return {
