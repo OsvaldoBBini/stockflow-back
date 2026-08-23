@@ -11,7 +11,7 @@ export async function handler(event: APIGatewayProxyEvent) {
   try {
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
 
-    logger.debug({ message: 'Fetching companies for user', userId });
+    logger.info({ message: 'Fetching companies for user', userId });
 
     const companies = await companyRepository.getCompanies(userId);
 

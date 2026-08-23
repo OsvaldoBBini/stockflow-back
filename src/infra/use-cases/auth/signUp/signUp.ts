@@ -37,7 +37,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       fullName 
     } = signUpSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email, fullName });
+    logger.info({ message: 'Input validation successful', email, fullName });
     const { userId } = await authGateway.signUp({ email, password, fullName });
     
     return {

@@ -17,7 +17,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     logger.info('Sign in process started');
     const { email, password } = signInSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email });
+    logger.info({ message: 'Input validation successful', email });
     const authResult = await authGateway.signIn({ email, password });
 
     if (!authResult) {

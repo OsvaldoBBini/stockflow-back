@@ -21,7 +21,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       confirmationCode
     } = accountConfirmationSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email });
+    logger.info({ message: 'Input validation successful', email });
     await authGateway.confirmAccount({ email, confirmationCode });
 
     logger.info({ message: 'Account confirmed successfully', email });

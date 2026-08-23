@@ -15,7 +15,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     logger.info('Refresh token process started');
     const { refreshToken } = refreshTokenSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', refreshToken });
+    logger.info({ message: 'Input validation successful', refreshToken });
     const authResult = await authGateway.refreshToken(refreshToken);
 
     if (!authResult) {

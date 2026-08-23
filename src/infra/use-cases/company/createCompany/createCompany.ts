@@ -19,7 +19,7 @@ export async function handler(event: APIGatewayProxyEvent) {
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
     
     const { companyName, cnpj, isDefault } = createCompanySchema.parse(JSON.parse(event.body || ''));
-    logger.debug({ message: 'Input validation successful', companyName });
+    logger.info({ message: 'Input validation successful', companyName });
 
     const company = await companyRepository.createCompany(
       { userId, cnpj, companyName, isDefault, role: 'owner' }

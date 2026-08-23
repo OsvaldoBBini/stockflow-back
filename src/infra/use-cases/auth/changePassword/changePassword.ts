@@ -34,7 +34,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     logger.info('Change password process started');
     const { email, confirmationCode, newPassword } = changePasswordSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email });
+    logger.info({ message: 'Input validation successful', email });
     await authGateway.changePassword({ email, confirmationCode, newPassword });
 
     logger.info({ message: 'Password changed successfully', email });

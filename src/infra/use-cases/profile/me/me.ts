@@ -8,11 +8,11 @@ const { errorHandler } = new ErrorManager(logger);
 
 export async function handler(event: APIGatewayProxyEvent) {
   try {
-    logger.debug({ message: 'Get request context', requestContext: event.requestContext });
+    logger.info({ message: 'Get request context', requestContext: event.requestContext });
     const userId = event.requestContext.authorizer?.jwt.claims.sub;
 
     const attributes = await authGateway.getUserInfos(userId);
-    logger.debug({ message: 'Get attributes', attributes });
+    logger.info({ message: 'Get attributes', attributes });
     
     return {
       statusCode: 200,

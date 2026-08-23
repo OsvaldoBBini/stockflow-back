@@ -22,7 +22,7 @@ export async function handler(event: APIGatewayProxyEvent) {
       };
     }
 
-    logger.debug({ message: 'Fetching customers for company', companyId });
+    logger.info({ message: 'Fetching customers for company', companyId });
 
     const customers = await customerRepository.getCustomers(companyId);
   

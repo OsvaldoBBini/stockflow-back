@@ -25,7 +25,7 @@ export async function handler(event: APIGatewayProxyEvent) {
       phoneNumber,
       fullName } = updateCustomerSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email, fullName, cpf, phoneNumber });
+    logger.info({ message: 'Input validation successful', email, fullName, cpf, phoneNumber });
 
     await customerRepository.updateCustomer({companyId: companyId!, customerId: customerId!, email, cpf, phoneNumber, fullName });
   

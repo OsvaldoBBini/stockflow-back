@@ -19,7 +19,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
       email
     } = resendConfirmationCodeSchema.parse(JSON.parse(event.body || ''));
 
-    logger.debug({ message: 'Input validation successful', email });
+    logger.info({ message: 'Input validation successful', email });
     await authGateway.resendConfirmationCode(email);
 
     logger.info({ message: 'Confirmation code resent successfully', email });
