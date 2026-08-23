@@ -9,7 +9,7 @@ const { errorHandler } = new ErrorManager(logger);
 
 const createCompanySchema = z.object({
   companyName: z.string().min(2, {message: 'Company name must be at least 2 characters long.'}).max(20, {message: 'Company name must be at most 20 characters long.'}),
-  cnpj: z.string().regex(/^\d{14}$/, { message: 'CPF must be 11 digits long.' }),
+  cnpj: z.string().regex(/^\d{14}$/, { message: 'Cnpj must be 14 digits long.' }),
   isDefault: z.boolean().default(false)
 });
 
